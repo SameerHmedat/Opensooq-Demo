@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="Red">#FF0000</color>
+    <color name="Gray">#808080</color>
+    <color name="tomato">#FF6347</color>
+    <color name="gold">#FFD700</color>
+    <color name="deeppink">#FF1493</color>
+    <color name="burlywood">#DEB887</color>
+    <color name="plum">#DDA0DD</color>
+    <color name="olivedrab">#6B8E23</color>
+    <color name="slateblue">#6A5ACD</color>
+    <color name="dimgray">#696969</color>
+    <color name="mediumaquamarine">#66CDAA</color>
+    <color name="sky">#35B0FB</color>
+    <color name="black">#000000</color>
+
+    <color name="SymbolColor">#000</color>
+
+    <color name="statusBarColor">#000000</color>
+    <color name="materialPrimaryColor">#0f1516</color>
+
+
+    <color name="InactiveBottomNavIconColor">#FFF</color>
+    <color name="state_checked">#FF0000</color>
+
+
+</resources>
