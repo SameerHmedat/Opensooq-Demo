@@ -6,7 +6,6 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.opensooqdemo.ThirdActivity
 import com.example.opensooqdemo.assign_raw.AssignRaw
 import com.example.opensooqdemo.categories.CategoriesAndSub
 import com.example.opensooqdemo.option_raw.OptionRaw
@@ -15,7 +14,6 @@ import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.io.InputStream
 import java.nio.charset.Charset
@@ -36,7 +34,7 @@ class MainViewModel : ViewModel() {
         onError("Exception handled: ${throwable.localizedMessage}")
     }
 
-    suspend fun getFullOptionRaw(activity: Activity){
+    suspend fun getFullAssignRaw(activity: Activity) {
         viewModelScope.launch(Dispatchers.IO) {
 
             val json2 = readFromAsset(activity, "dynamic-attributes-assign-raw.json")
@@ -67,7 +65,11 @@ class MainViewModel : ViewModel() {
                     }
                 }
             }
+        }
+    }
 
+    suspend fun getFullOptionRaw(activity: Activity) {
+        viewModelScope.launch(Dispatchers.IO) {
             val json = readFromAsset(activity, "dynamic-attributes-and-options-raw.json")
             try {
                 optionRawList = Gson().fromJson(json, OptionRaw::class.java)
@@ -76,7 +78,7 @@ class MainViewModel : ViewModel() {
             }
 
             val emptyOrNot1 = databaseOperations.retrieveRawFieldOption()
-            if (emptyOrNot1 !=null) {
+            if (emptyOrNot1 != null) {
                 for (i in 0 until optionRawList?.result?.data?.fields?.size!!) {
                     optionRawList?.result?.data?.fields?.get(i).let {
                         if (it != null) {
@@ -87,18 +89,15 @@ class MainViewModel : ViewModel() {
             }
 
             val emptyOrNot2 = databaseOperations.retrieveOptionRawOption()
-            if (emptyOrNot2 !=null) {
-                for (i in 0 until optionRawList?.result?.data?.options?.size!!) {
-                    optionRawList?.result?.data?.options?.get(i).let {
-                        if (it != null) {
+            if (emptyOrNot2 != null) {
+//                for (i in 0 until optionRawList?.result?.data?.options?.size!!) {
+                    optionRawList?.result?.data?.options?.let {
                             databaseOperations.insertOptionRawOption(it)
-                        }
-                    }
+             //       }
                 }
             }
         }
     }
-
 
     @SuppressLint("SuspiciousIndentation")
     suspend fun getCategories(activity: Activity) {
@@ -110,7 +109,7 @@ class MainViewModel : ViewModel() {
                 Log.e("error parsing", e.toString())
             }
 
-        val emptyOrNot = databaseOperations.retrieveDataItemCategoryRealmObject()
+            val emptyOrNot = databaseOperations.retrieveDataItemCategoryRealmObject()
             if (emptyOrNot?.size == 0) {
                 for (i in 0 until categoriesList?.result?.dataCateg?.itemCategs?.size!!) {
                     categoriesList!!.result!!.dataCateg!!.itemCategs?.get(i)?.let {
@@ -125,7 +124,6 @@ class MainViewModel : ViewModel() {
         }
         categoriesMutableLiveData.postValue(categoriesList)
     }
-
 
 
     fun readFromAsset(act: Activity, fileName: String): String {

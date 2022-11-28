@@ -5,6 +5,7 @@ import com.example.opensooqdemo.categories.ItemCateg
 import com.example.opensooqdemo.categories.SubCategory
 import com.example.opensooqdemo.option_raw.*
 import io.realm.Realm
+import io.realm.RealmList
 import io.realm.RealmResults
 import io.realm.kotlin.executeTransactionAwait
 import kotlinx.coroutines.Dispatchers
@@ -100,24 +101,39 @@ open class Operations() {
         return realm.where(FieldOption::class.java).findAll()
     }
 
-    fun retrieveRawFieldOption(name:String): FieldOption? {
+    fun retrieveFieldOptionWithParentID(id:Int): FieldOption? {
+        val realm = Realm.getDefaultInstance()
+        return realm.where(FieldOption::class.java).
+        equalTo("parent_id",id).
+        findFirst()
+    }
+
+    fun retrieveRawFieldOption(name:String,parentID: Int): FieldOption? {
         val realm = Realm.getDefaultInstance()
         return realm.where(FieldOption::class.java)
             .equalTo("name",name)
+            .equalTo("parent_id",parentID)
             .findFirst()
     }
 
+    fun retrieveAllOption(): RealmResults<Option>? {
+        val realm = Realm.getDefaultInstance()
+        return realm.where(Option::class.java)
+            .findAll()
+    }
 
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////
 
-    suspend fun insertOptionRawOption(option: Option) {
+    suspend fun insertOptionRawOption(option: RealmList<Option?>) {
         val realm = Realm.getDefaultInstance()
         realm.executeTransactionAwait(Dispatchers.IO) { realmTransaction ->
-            val fullData = Option(option.id,option.field_id,option.label,option.label_en,option.value,option.option_img,option.has_child,option.parent_id,option.order)
+            for(i in 0 until option.size){
+            val fullData = Option(option[i]?.id,option[i]?.field_id,option[i]?.label,option[i]?.label_en,option[i]?.value,option[i]?.option_img,option[i]?.has_child,option[i]?.parent_id,option[i]?.order)
             realmTransaction.insertOrUpdate(fullData)
         }
+      }
     }
 
     fun retrieveOptionRawOption(): RealmResults<Option>? {
@@ -125,24 +141,16 @@ open class Operations() {
         return realm.where(Option::class.java).findAll()
     }
 
-   fun retrieveOptionRawOption(field_id:String): RealmResults<Option>? {
+
+    fun retrieveOptionWithParentNull(field_id:String, parent_id: String?): RealmResults<Option>? {
+        val zer0="0"
         val realm = Realm.getDefaultInstance()
         return realm.where(Option::class.java)
             .equalTo("field_id",field_id)
+            .equalTo("parent_id",parent_id)
+            .or()
+            .equalTo("parent_id",zer0)
             .findAll()
     }
-
-  fun retrieveTesting(): RealmResults<Option>? {
-        val realm = Realm.getDefaultInstance()
-        return realm.where(Option::class.java)
-            .equalTo("field_id","7")
-            .findAll()
-    }
-
-
-
-
-
-
 }
 

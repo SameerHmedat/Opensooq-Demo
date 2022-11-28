@@ -20,11 +20,14 @@ class SplashActivity : AppCompatActivity() {
 
         lifecycleScope.launch(Dispatchers.IO) {
             viewModel.getCategories(this@SplashActivity)
+            viewModel.getFullAssignRaw(this@SplashActivity)
             viewModel.getFullOptionRaw(this@SplashActivity)
         }
 
+
         imgSplash.alpha=0f
-        imgSplash.animate().setDuration(66000).alpha(1f).withEndAction{
+
+        imgSplash.animate().setDuration(10000).alpha(1f).withEndAction{
             val intent= Intent(this@SplashActivity,MainActivity::class.java)
             startActivity(intent)
         }

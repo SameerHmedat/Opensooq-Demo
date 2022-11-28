@@ -1,6 +1,7 @@
 package com.example.opensooqdemo
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -39,5 +40,22 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         })
-}
+    }
+
+    override fun onBackPressed() {
+        val builder = AlertDialog.Builder(this)
+        builder.setMessage("Do you want to exit ?")
+        builder.setTitle("Attention !!")
+        builder.setCancelable(false)
+        builder.setPositiveButton("Yes") { _, _ ->
+            finish()
+        }
+        builder.setNegativeButton("No") { dialog, _ ->
+            dialog.cancel()
+        }
+
+        val alertDialog = builder.create()
+        alertDialog.show()
+
+    }
 }

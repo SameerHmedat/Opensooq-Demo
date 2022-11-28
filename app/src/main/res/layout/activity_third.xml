@@ -2,11 +2,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:orientation="vertical"
-    android:background="#FAFAFA"
     android:id="@+id/thirdActivityLinearLayout"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FAFAFA"
+    android:orientation="vertical"
     tools:context=".SecondActivity">
 
     <com.google.android.material.appbar.MaterialToolbar
@@ -14,17 +14,57 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/sky"
-        app:title="Filter"
         app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
-        app:titleTextColor="@color/white"
+        app:title="Filter"
         app:titleCentered="false"
         app:titleMarginStart="30dp"
-        />
+        app:titleTextColor="@color/white" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
     <androidx.recyclerview.widget.RecyclerView
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         android:id="@+id/recyclerViewFull"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:layout_marginBottom="42dp"
+        />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="bottom">
 
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/ResetFields"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_weight="1.2"
+                android:background="#565656"
+                android:backgroundTint="#565656"
+                android:drawableLeft="@android:drawable/ic_menu_close_clear_cancel"
+                android:drawableTint="#FFFFFFFF"
+                android:text="Reset Fields"
+                android:textSize="18sp"
+                android:textAllCaps="false"
+                android:textColor="@color/white" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/Filter_results"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_weight="2"
+                android:background="#86B920"
+                android:backgroundTint="#86B920"
+                android:textSize="18sp"
+                android:text="Filter results (57,258)"
+                android:textAllCaps="false"
+                android:textColor="@color/white" />
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>

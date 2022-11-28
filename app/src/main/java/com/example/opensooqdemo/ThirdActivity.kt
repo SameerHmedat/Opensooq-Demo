@@ -7,93 +7,162 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.opensooqdemo.dataBinding.Database
-import com.example.opensooqdemo.dataBinding.LargeAdapter
-import com.example.opensooqdemo.databinding.ActivityThirdBinding
-import com.example.opensooqdemo.option_raw.Option
+import com.example.opensooqdemo.option_raw.FieldOption
 import com.example.opensooqdemo.realmManager.Operations
-import com.example.opensooqdemo.viewModel.MainViewModel
-import io.realm.Realm
-import io.realm.RealmResults
+import kotlinx.android.synthetic.main.activity_third.*
 
 class ThirdActivity : AppCompatActivity() {
 
-    private val viewModel: MainViewModel by lazy { ViewModelProvider(this)[MainViewModel::class.java] }
-    private lateinit var binding: ActivityThirdBinding
     private val adapterList by lazy { LargeAdapter() }
+
 
     @SuppressLint("SuspiciousIndentation")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityThirdBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        setContentView(R.layout.activity_third)
+
+        toolbarFilter.setNavigationOnClickListener {
+            onBackPressed()
+        }
 
 
         changingStatusColor()
 
         val bundleID = intent.extras?.getInt("itemID")
-        val dataOperations = Operations()
 
+        val dataOperations = Operations()
 
         val mySearchFlowNormal = dataOperations.retrieveAssignRawSearchFlow(bundleID!!)
 
-
         if (mySearchFlowNormal == null) {
-                    Toast.makeText(
-                        this@ThirdActivity,
-                        "This category is not found",
-                        Toast.LENGTH_SHORT
-                    ).show()
+            Toast.makeText(
+                this@ThirdActivity,
+                "This category is not found",
+                Toast.LENGTH_SHORT
+            ).show()
 
-                } else {
+        } else {
 
-                    val listofLableEN = arrayListOf<String>()
-                    val results = arrayListOf<ClassFieldOfOption>()
-                    var res = arrayListOf<String>()
+            val results = arrayListOf<FieldOptionModel>()
 
-                    for (i in 0 until mySearchFlowNormal.order!!.size) {
-                        val assignRawFieldLable = dataOperations.retrieveAssignRawFieldsLable(mySearchFlowNormal.order!![i]!!)
-                        assignRawFieldLable?.label_en?.let { listofLableEN.add(it)
+            for (i in 0 until mySearchFlowNormal.order!!.size) {
+
+                val assignRawFieldLable =
+                    dataOperations.retrieveAssignRawFieldsLable(mySearchFlowNormal.order!![i]!!)
+
+                val rawFieldOption =
+                    dataOperations.retrieveRawFieldOption(mySearchFlowNormal.order!![i]!!, 0)
+
+                val listofFiledOption =
+                    dataOperations.retrieveOptionWithParentNull(rawFieldOption?.id.toString(), null)
+
+                val filedId = rawFieldOption?.id.toString()
+
+                val options = listofFiledOption?.filter {
+                    it.field_id == filedId
+                }
+
+                rawFieldOption?.let { fieldOption ->
+                    assignRawFieldLable?.label_en?.let { label ->
+                        FieldOptionModel(
+                            fieldOption = fieldOption,
+                            options = options.orEmpty(),
+                            selectedOptions = mutableSetOf(),
+                            LableEN = label,
+                            activity = this@ThirdActivity,
+                        )
+                    }
+                }
+                    ?.let { results.add(it) }
+            }
+
+            for (i in 0 until results.size) {
+                Log.d("sss", results[i].toString())
+            }
+            Log.d("sss", results.size.toString())
+
+            adapterList.itemList = results
+            recyclerViewFull.layoutManager = LinearLayoutManager(this@ThirdActivity)
+            recyclerViewFull.adapter = adapterList
+
+
+            ResetFields.setOnClickListener{
+                for(i in 0 until adapterList.itemList.size){
+                    adapterList.itemList[i].selectedOptions.clear()
+                    adapterList.notifyDataSetChanged()
+                }
+            }
+
+            adapterList.setType(object : LargeAdapter.OnTypeClick {
+                override fun onClick(fieldOptionEn: FieldOptionModel) {
+
+                    val fieldID = fieldOptionEn.fieldOption.id.toString() //Brand
+                    val dataOperation = Operations()
+                    val fieldOption = dataOperation.retrieveFieldOptionWithParentID(fieldID.toInt())
+
+                    removeElement(fieldOption)
+
+                    if (fieldOptionEn.selectedOptions.size == 1) {
+                        var clickedID: String? = null// for example Kia
+
+                        val filterOptions = fieldOptionEn.options.filter {
+                            fieldOptionEn.selectedOptions.contains(it.id)
                         }
 
-                        val rawFieldOption = dataOperations.retrieveRawFieldOption(mySearchFlowNormal.order!![i]!!)
-                        res.add(rawFieldOption.toString())
+                        for (j in 0 until fieldOptionEn.options.size) {
+                            if (fieldOptionEn.options[j].label_en == filterOptions[0].label_en) {
+                                clickedID = fieldOptionEn.options[j].id!!
+                            }
+                        }
 
-                        val listofFiledOption =dataOperations.retrieveOptionRawOption(rawFieldOption?.id.toString())
+                        val allOptions = dataOperation.retrieveAllOption()
+                        val updatedOptions = allOptions?.filter { it ->
+                            it.parent_id == clickedID
+                        }
 
-                      //  res.add(listofFiledOption.toString())
+                        val fieldEnglish = fieldOption?.name?.let {
+                            dataOperation.retrieveAssignRawFieldsLable(
+                                it
+                            )
+                        }?.label_en
 
-//                        results.add(ClassFieldOfOption(rawFieldOption, listofFiledOption))
-
-                          rawFieldOption?.id?.toString()?.let { it1 -> dataOperations.retrieveOptionRawOption(it1) }
-                        rawFieldOption?.let { it1 -> ClassFieldOfOption(it1, listofFiledOption!!) }?.let { it2 -> results.add(it2) }
-
+                        fieldOption?.let {
+                            updatedOptions?.let { it1 ->
+                                FieldOptionModel(
+                                    fieldOption = it,
+                                    options = it1,
+                                    selectedOptions = mutableSetOf(),
+                                    LableEN = fieldEnglish.toString(),
+                                    activity = fieldOptionEn.activity,
+                                )
+                            }
+                        }?.let { adapterList.itemList.add(1, it) }
+                        adapterList.notifyDataSetChanged()
+                    } else {
+                        removeElement(fieldOption)
+                        adapterList.notifyDataSetChanged()
                     }
+                }
+            })
 
-            val res1=dataOperations.retrieveTesting()
-            if (res1 != null) {
-                for (i in 0 until res1.size){
-                    Log.d("sss", res1!![i].toString())}
-            }
+        }
+    }
 
-
-                     val itemList = Database.getItems(listofLableEN, results)
-                    adapterList.updateList(itemList)
-                    binding.recyclerViewFull.apply {
-                        layoutManager =
-                            LinearLayoutManager(this@ThirdActivity, LinearLayoutManager.VERTICAL, false)
-                        adapter = adapterList
-                    }
+    private fun removeElement(fieldOption: FieldOption?) {
+        for (t in 0 until adapterList.itemList.size) {
+            if (fieldOption?.id == adapterList.itemList[t].fieldOption.id) {
+                adapterList.itemList.remove(element = adapterList.itemList[t])
+                break
             }
         }
+    }
+
 
     private fun changingStatusColor() {
         val window = this.window
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
         window.statusBarColor = ContextCompat.getColor(this, R.color.skyDark)
-
     }
 }

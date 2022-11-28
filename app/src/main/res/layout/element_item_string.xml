@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="@color/white"
@@ -12,10 +11,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
+        android:paddingEnd="12dp"
+        android:paddingStart="2dp"
         android:background="@color/white"
         android:orientation="horizontal">
 
@@ -24,19 +21,9 @@
             android:id="@+id/CardString"
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:background="#EEEEEE"
-            android:innerRadius="0dp"
-            android:shape="ring"
-            android:textColor="@color/white"
-            android:textSize="25sp"
-            android:thicknessRatio="1.9"
+            android:layout_margin="10dp"
             app:cardCornerRadius="40dp"
-            android:clickable="true"
             android:checkable="true"
-            android:focusable="true"
             app:rippleColor="@color/sky"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -65,7 +52,7 @@
 
 
         <ImageView
-            android:id="@+id/checkCircularString"
+            android:id="@+id/CardStringCheck"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:elevation="4dp"

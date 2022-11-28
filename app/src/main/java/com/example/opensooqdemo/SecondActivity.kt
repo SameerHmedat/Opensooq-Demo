@@ -9,46 +9,51 @@ import com.example.opensooqdemo.realmManager.Operations
 import com.example.opensooqdemo.realmManager.RealmSubCategoryAdapter
 import com.example.opensooqdemo.viewModel.MainViewModel
 import kotlinx.android.synthetic.main.activity_second.*
+import kotlinx.android.synthetic.main.activity_third.*
 
 class SecondActivity : AppCompatActivity() {
 
-    private val viewModel: MainViewModel by lazy { ViewModelProvider(this)[MainViewModel::class.java] }
 
-    private var mySecAdapter: RealmSubCategoryAdapter?= null
+    private var mySecAdapter: RealmSubCategoryAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_second)
 
+        toolbarSubCategory.setNavigationOnClickListener {
+            onBackPressed()
+        }
 
-        val  bundleID =intent.extras?.getInt("ID")
-        val  bundleLable =intent.extras?.getString("lable")
-        val  positionPrevious =intent.extras?.getInt("position")
+        val bundleID = intent.extras?.getInt("ID")
+        val bundleLable = intent.extras?.getString("lable")
+        val positionPrevious = intent.extras?.getInt("position")
 
 
         val databaseOperations = Operations()
         val dataReal = databaseOperations.retrieveDataItemSubCategoryRealmObject(bundleID)
-        txtHeader.text=bundleLable.toString()
+        txtHeader.text = bundleLable.toString()
 
 
-        mySecAdapter= RealmSubCategoryAdapter(dataReal)
+        mySecAdapter = RealmSubCategoryAdapter(dataReal)
         rvSubCategories.layoutManager = LinearLayoutManager(this)
         rvSubCategories.setHasFixedSize(false)
         rvSubCategories.adapter = mySecAdapter
 
-        val items=databaseOperations.retrieveDataItemCategoryRealmObject()
+        val items = databaseOperations.retrieveDataItemCategoryRealmObject()
 
-        mySecAdapter?.setOnItemClickListener(object : RealmSubCategoryAdapter.OnItemClickedListener{
+        mySecAdapter?.setOnItemClickListener(object :
+            RealmSubCategoryAdapter.OnItemClickedListener {
             override fun onItemClick(position: Int) {
-                val intent=Intent(this@SecondActivity,ThirdActivity::class.java)
-                val itemID= items!![positionPrevious!!]!!.subCategories!![position]!!.id
-                intent.putExtra("itemID",itemID)
+                val intent = Intent(this@SecondActivity, ThirdActivity::class.java)
+                val itemID = items!![positionPrevious!!]!!.subCategories!![position]!!.id
+                intent.putExtra("itemID", itemID)
                 startActivity(intent)
             }
 
         })
 
 
-
     }
+
+
 }

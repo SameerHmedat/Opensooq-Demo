@@ -1,54 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <data>
-        <variable
-            name="listOfBoolean"
-            type="com.example.opensooqdemo.dataBinding.DataItem.ListOfBoolean" />
-    </data>
 
-    <LinearLayout
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#FAFAFA"
+    android:orientation="vertical">
+
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#FAFAFA"
-        android:orientation="vertical">
+        android:layout_height="match_parent"
+        android:layout_margin="12dp"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="2dp">
 
-        <androidx.cardview.widget.CardView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="12dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="2dp">
+            android:background="@color/white"
+            android:orientation="vertical">
 
-            <LinearLayout
+            <TextView
+                android:id="@+id/booleanTitle"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/white"
-                android:orientation="vertical">
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="12dp"
-                    android:paddingEnd="12dp"
-                    android:layout_marginBottom="5dp"
-                    android:text="@{listOfBoolean.component1()}"
-                    android:id="@+id/modalHeade"
-                    android:textColor="@color/black"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvListOfBoolean"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="12dp"
+                android:orientation="horizontal" />
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvListOfBoolean"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal" />
+        </LinearLayout>
 
-            </LinearLayout>
-
-        </androidx.cardview.widget.CardView>
+    </androidx.cardview.widget.CardView>
 
 
-    </LinearLayout>
-</layout>
+</LinearLayout>
