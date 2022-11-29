@@ -38,7 +38,7 @@ class MainViewModel : ViewModel() {
     fun finishCallBack(listener: FinishInsertion) {
         mListener = listener
     }
-//
+
     @SuppressLint("SuspiciousIndentation")
     fun getCategories(activity: Activity) {
         viewModelScope.launch(Dispatchers.IO) {
