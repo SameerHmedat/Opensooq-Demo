@@ -143,7 +143,7 @@ class LargeAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         }
 
     }
-
+//
     class ListOfNumericViewHolder(val itemBinding: ListNumericBinding) :
         RecyclerView.ViewHolder(itemBinding.root) {
 
