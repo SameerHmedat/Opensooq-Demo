@@ -8,5 +8,4 @@ data class FieldOptionModel(
     var options: List<Option>,
     val selectedOptions:MutableSet<String>,
     val LableEN: String,
-    val activity: ThirdActivity,
 )

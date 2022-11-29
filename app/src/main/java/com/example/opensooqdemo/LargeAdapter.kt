@@ -17,6 +17,7 @@ import com.example.opensooqdemo.list_of_string.StringAdapter
 import com.example.opensooqdemo.list_icon.DialogIcon
 import com.example.opensooqdemo.list_icon.IconAdapter
 import com.google.android.flexbox.*
+import kotlinx.android.synthetic.main.activity_third.view.*
 import kotlinx.android.synthetic.main.custom_dialog_taps.*
 
 
@@ -57,7 +58,7 @@ class LargeAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 val dialog = DialogString(
                     fieldOptionEn
                 )
-                dialog.showDialog()
+                dialog.showDialog(itemBinding.rvListOfString.context)
                 dialog.setDialogResult(object : DialogString.ClassDialogStringListener {
                     @SuppressLint("NotifyDataSetChanged")
                     override fun applyDialog() {
@@ -122,7 +123,7 @@ class LargeAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 val dialog = DialogIcon(
                     fieldOptionEn
                 )
-                dialog.showDialog()
+                dialog.showDialog(context = itemBinding.rvListOfIconOFString.context)
                 dialog.setDialogResult(object : DialogIcon.ClassDialogListener {
                     @SuppressLint("NotifyDataSetChanged")
                     override fun applyDialog() {
@@ -156,9 +157,10 @@ class LargeAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
             itemBinding.layoutFrom.setOnClickListener {
                 val dialog = DialogNumeric(
-                    fieldOptionEn
+                    fieldOptionModel = fieldOptionEn,
+                    context = itemBinding.numericValueTo.context
                 )
-                dialog.showDialog()
+                dialog.showDialog(itemBinding.numericValueTo.context as ThirdActivity)
                 dialog.setResultDialog(object : DialogNumeric.DialogListener {
                     override fun applyDialog(value: String) {
                         itemBinding.numericValueFrom.text = value
@@ -168,9 +170,11 @@ class LargeAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
             itemBinding.layoutTo.setOnClickListener {
                 val dialog = DialogNumeric(
-                    fieldOptionEn
+                    fieldOptionModel = fieldOptionEn,
+                    context = itemBinding.numericValueTo.context
+
                 )
-                dialog.showDialog()
+                dialog.showDialog(itemBinding.numericValueTo.context as ThirdActivity)
                 dialog.dialog.tab_layout.getTabAt(1)?.select()
                 dialog.setResultDialog(object : DialogNumeric.DialogListener {
                     override fun applyDialog(value: String) {
@@ -187,7 +191,7 @@ class LargeAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         fun bind(fieldOptionEn: FieldOptionModel) {
             itemBinding.booleanTitle.text = fieldOptionEn.LableEN
-            val layoutManager = FlexboxLayoutManager(fieldOptionEn.activity)
+            val layoutManager = FlexboxLayoutManager(itemBinding.rvListOfBoolean.context)
             layoutManager.flexWrap = FlexWrap.WRAP
             layoutManager.flexDirection = FlexDirection.ROW
             itemBinding.rvListOfBoolean.layoutManager = layoutManager

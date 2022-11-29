@@ -1,14 +1,18 @@
 package com.example.opensooqdemo.list_of_numeric
 
+import android.app.Activity
+import android.content.Context
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.example.opensooqdemo.FieldOptionModel
+import com.example.opensooqdemo.ThirdActivity
 
 
 class ViewPagerAdapter(
-    val fieldOptionModel: FieldOptionModel
+    val fieldOptionModel: FieldOptionModel,
+    activity: ThirdActivity
 ) :
-    FragmentStateAdapter(fieldOptionModel.activity.supportFragmentManager, fieldOptionModel.activity.lifecycle) {
+    FragmentStateAdapter(activity.supportFragmentManager, activity.lifecycle) {
 
     private lateinit var listener: ViewListener
 

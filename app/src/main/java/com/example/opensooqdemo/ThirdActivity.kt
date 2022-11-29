@@ -70,7 +70,6 @@ class ThirdActivity : AppCompatActivity() {
                             options = options.orEmpty(),
                             selectedOptions = mutableSetOf(),
                             LableEN = label,
-                            activity = this@ThirdActivity,
                         )
                     }
                 }
@@ -87,12 +86,6 @@ class ThirdActivity : AppCompatActivity() {
             recyclerViewFull.adapter = adapterList
 
 
-            ResetFields.setOnClickListener{
-                for(i in 0 until adapterList.itemList.size){
-                    adapterList.itemList[i].selectedOptions.clear()
-                    adapterList.notifyDataSetChanged()
-                }
-            }
 
             adapterList.setType(object : LargeAdapter.OnTypeClick {
                 override fun onClick(fieldOptionEn: FieldOptionModel) {
@@ -134,7 +127,6 @@ class ThirdActivity : AppCompatActivity() {
                                     options = it1,
                                     selectedOptions = mutableSetOf(),
                                     LableEN = fieldEnglish.toString(),
-                                    activity = fieldOptionEn.activity,
                                 )
                             }
                         }?.let { adapterList.itemList.add(1, it) }

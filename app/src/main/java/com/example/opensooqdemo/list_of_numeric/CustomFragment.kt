@@ -26,7 +26,7 @@ class CustomFragment(
         super.onViewCreated(view, savedInstanceState)
         titleCustomFragment.text = fieldOptionModel.LableEN
 
-        rvCustomFragment.layoutManager = LinearLayoutManager(fieldOptionModel.activity)
+        rvCustomFragment.layoutManager = LinearLayoutManager(rvCustomFragment.context)
         rvCustomFragment.setHasFixedSize(true)
 
         val madapter = TapsAdapter(fieldOptionModel.options)

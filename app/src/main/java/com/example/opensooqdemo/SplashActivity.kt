@@ -3,6 +3,7 @@ package com.example.opensooqdemo
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.opensooqdemo.viewModel.MainViewModel
@@ -18,18 +19,15 @@ class SplashActivity : AppCompatActivity() {
         setContentView(R.layout.activity_splash)
 
 
-        lifecycleScope.launch(Dispatchers.IO) {
             viewModel.getCategories(this@SplashActivity)
-            viewModel.getFullAssignRaw(this@SplashActivity)
-            viewModel.getFullOptionRaw(this@SplashActivity)
+
+            viewModel.finishCallBack(object : MainViewModel.FinishInsertion {
+                override fun onFinish() {
+                    val intent = Intent(this@SplashActivity, MainActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                }
+            })
         }
 
-
-        imgSplash.alpha=0f
-
-        imgSplash.animate().setDuration(10000).alpha(1f).withEndAction{
-            val intent= Intent(this@SplashActivity,MainActivity::class.java)
-            startActivity(intent)
-        }
     }
-}

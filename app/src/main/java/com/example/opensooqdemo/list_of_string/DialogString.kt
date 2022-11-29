@@ -1,6 +1,7 @@
 package com.example.opensooqdemo.list_of_string
 
 import android.app.Dialog
+import android.content.Context
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.opensooqdemo.FieldOptionModel
 import com.example.opensooqdemo.R
@@ -10,13 +11,13 @@ class DialogString(val fieldOptionEn: FieldOptionModel) {
 
     private lateinit var listener: ClassDialogStringListener
 
-    fun showDialog() {
-        val dialog = Dialog(fieldOptionEn.activity)
+    fun showDialog(context: Context) {
+        val dialog = Dialog(context)
         dialog.setCancelable(false)
         dialog.setContentView(R.layout.custom_dialogbox)
         dialog.ModelDialog.text = fieldOptionEn.LableEN
         dialog.txtInputLayoutSearchDialogBox.hint = fieldOptionEn.LableEN
-        dialog.rvCustomDialog.layoutManager = LinearLayoutManager(fieldOptionEn.activity)
+        dialog.rvCustomDialog.layoutManager = LinearLayoutManager( dialog.rvCustomDialog.context)
         dialog.rvCustomDialog.setHasFixedSize(true)
         val myNewCustomAdapter = DialogStringAdapter(fieldOptionEn.options,fieldOptionEn.selectedOptions)
         dialog.rvCustomDialog.adapter = myNewCustomAdapter

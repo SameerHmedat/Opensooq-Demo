@@ -14,6 +14,7 @@ import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.io.InputStream
 import java.nio.charset.Charset
@@ -21,21 +22,48 @@ import java.nio.charset.Charset
 class MainViewModel : ViewModel() {
 
     private val databaseOperations = Operations()
-    val categoriesMutableLiveData = MutableLiveData<CategoriesAndSub?>()
+
     var categoriesList: CategoriesAndSub? = null
 
-    val assignRawMutableLiveData = MutableLiveData<AssignRaw?>()
     var assignRawList: AssignRaw? = null
 
-    val optionRawMutableLiveData = MutableLiveData<OptionRaw?>()
     var optionRawList: OptionRaw? = null
 
-    val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        onError("Exception handled: ${throwable.localizedMessage}")
+    private lateinit var mListener: FinishInsertion
+
+    interface FinishInsertion {
+        fun onFinish()
     }
 
-    suspend fun getFullAssignRaw(activity: Activity) {
+    fun finishCallBack(listener: FinishInsertion) {
+        mListener = listener
+    }
+
+    @SuppressLint("SuspiciousIndentation")
+    fun getCategories(activity: Activity) {
         viewModelScope.launch(Dispatchers.IO) {
+            val json = readFromAsset(activity, "categoriesAndsubCategories.json")
+            try {
+                categoriesList = Gson().fromJson(json, CategoriesAndSub::class.java)
+            } catch (e: Exception) {
+                Log.e("error parsing", e.toString())
+            }
+
+            val emptyOrNot = databaseOperations.retrieveDataItemCategoryRealmObject()
+            if (emptyOrNot?.size == 0) {
+                for (i in 0 until categoriesList?.result?.dataCateg?.itemCategs?.size!!) {
+                    categoriesList!!.result!!.dataCateg!!.itemCategs?.get(i)?.let {
+                        databaseOperations.insertCategoryData(
+                            it
+                        )
+                    }
+                }
+            } else {
+                Log.d(
+                    "size of categoriesList",
+                    "${categoriesList?.result?.dataCateg?.itemCategs?.size!!}"
+                )
+            }
 
             val json2 = readFromAsset(activity, "dynamic-attributes-assign-raw.json")
             try {
@@ -65,14 +93,10 @@ class MainViewModel : ViewModel() {
                     }
                 }
             }
-        }
-    }
 
-    suspend fun getFullOptionRaw(activity: Activity) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val json = readFromAsset(activity, "dynamic-attributes-and-options-raw.json")
+            val json3 = readFromAsset(activity, "dynamic-attributes-and-options-raw.json")
             try {
-                optionRawList = Gson().fromJson(json, OptionRaw::class.java)
+                optionRawList = Gson().fromJson(json3, OptionRaw::class.java)
             } catch (e: Exception) {
                 Log.d("error parsing", e.toString())
             }
@@ -90,60 +114,32 @@ class MainViewModel : ViewModel() {
 
             val emptyOrNot2 = databaseOperations.retrieveOptionRawOption()
             if (emptyOrNot2 != null) {
-//                for (i in 0 until optionRawList?.result?.data?.options?.size!!) {
-                    optionRawList?.result?.data?.options?.let {
-                            databaseOperations.insertOptionRawOption(it)
-             //       }
+                optionRawList?.result?.data?.options?.let {
+                    databaseOperations.insertOptionRawOption(it)
                 }
+                mListener.onFinish()
             }
         }
     }
 
-    @SuppressLint("SuspiciousIndentation")
-    suspend fun getCategories(activity: Activity) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val json = readFromAsset(activity, "categoriesAndsubCategories.json")
-            try {
-                categoriesList = Gson().fromJson(json, CategoriesAndSub::class.java)
-            } catch (e: Exception) {
-                Log.e("error parsing", e.toString())
-            }
-
-            val emptyOrNot = databaseOperations.retrieveDataItemCategoryRealmObject()
-            if (emptyOrNot?.size == 0) {
-                for (i in 0 until categoriesList?.result?.dataCateg?.itemCategs?.size!!) {
-                    categoriesList!!.result!!.dataCateg!!.itemCategs?.get(i)?.let {
-                        databaseOperations.insertCategoryData(
-                            it
-                        )
-                    }
-                }
-            } else {
-                Log.d("Solling ", "Solling${categoriesList?.result?.dataCateg?.itemCategs?.size!!}")
-            }
-        }
-        categoriesMutableLiveData.postValue(categoriesList)
-    }
 
 
-    fun readFromAsset(act: Activity, fileName: String): String {
+
+    private fun readFromAsset(activity: Activity, fileName: String): String {
         var text = ""
         try {
-            val `is`: InputStream = act.assets.open(fileName)
+            val `is`: InputStream = activity.assets.open(fileName)
             val size: Int = `is`.available()
             // Read the entire asset into a local byte buffer.
             val buffer = ByteArray(size)
             `is`.read(buffer)
             `is`.close()
             val charset: Charset = Charsets.UTF_8
+            //Converts the data from the specified array of bytes to characters
             text = String(buffer, charset)
         } catch (e: IOException) {
             e.printStackTrace()
         }
         return text
     }
-}
-
-private fun onError(message: String) {
-
 }

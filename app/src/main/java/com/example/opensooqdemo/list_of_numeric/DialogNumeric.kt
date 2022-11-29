@@ -1,21 +1,24 @@
 package com.example.opensooqdemo.list_of_numeric
 
 import android.app.Dialog
+import android.content.Context
 import com.example.opensooqdemo.FieldOptionModel
 import com.example.opensooqdemo.R
+import com.example.opensooqdemo.ThirdActivity
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.custom_dialog_taps.*
 
 class DialogNumeric(
     private val fieldOptionModel: FieldOptionModel,
+    context: Context
 ) {
     private lateinit var listener: DialogListener
-    val dialog = Dialog(fieldOptionModel.activity)
+    val dialog = Dialog(context)
 
-    fun showDialog() {
+    fun showDialog(activity: ThirdActivity) {
         dialog.setContentView(R.layout.custom_dialog_taps)
         val adapter = ViewPagerAdapter(
-          fieldOptionModel
+          fieldOptionModel,activity
         )
 
         dialog.viewPager2.adapter = adapter
