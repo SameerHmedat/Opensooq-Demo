@@ -1,4 +1,4 @@
-package com.example.opensooqdemo.realmManager
+package com.example.opensooqdemo.realm
 
 import com.example.opensooqdemo.assign_raw.*
 import com.example.opensooqdemo.categories.ItemCateg
@@ -11,104 +11,113 @@ import io.realm.kotlin.executeTransactionAwait
 import kotlinx.coroutines.Dispatchers
 
 
-open class Operations() {
+open class Operations {
 
     //Category and SubCategory
 
-    suspend fun insertCategoryData(itemCateg: ItemCateg) {
+    suspend fun insertCategoryData(itemCategories: RealmList<ItemCateg?>) {
 
         val realm = Realm.getDefaultInstance()
         realm.executeTransactionAwait(Dispatchers.IO) { realmTransaction ->
-            val item = ItemCateg(itemCateg.has_child,itemCateg.icon,itemCateg.id,itemCateg.label,
-                itemCateg.label_ar,itemCateg.label_en,itemCateg.name,itemCateg.order,itemCateg.parent_id,
-                itemCateg.reporting_name,itemCateg.subCategories)
+            for(i in 0 until itemCategories.size){
+            val item = ItemCateg(itemCategories[i]?.has_child,itemCategories[i]?.icon,itemCategories[i]?.id,itemCategories[i]?.label,
+                itemCategories[i]?.label_ar,itemCategories[i]?.label_en,itemCategories[i]?.name,itemCategories[i]?.order,itemCategories[i]?.parent_id,
+                itemCategories[i]?.reporting_name,itemCategories[i]?.subCategories)
             realmTransaction.insertOrUpdate(item)
+            }
         }
         realm.close()
     }
 
-    fun retrieveDataItemCategoryRealmObject(): RealmResults<ItemCateg>? {
+    fun retrieveCategories(): RealmResults<ItemCateg>? {
         val realm = Realm.getDefaultInstance()
         return realm.where(ItemCateg::class.java).sort("order").findAll()
     }
 
-    fun retrieveDataItemSubCategoryRealmObject(parentID:Int?): RealmResults<SubCategory>? {
+    fun retrieveSubCategories(parentID:Int?): RealmResults<SubCategory>? {
         val realm = Realm.getDefaultInstance()
         return realm.where(SubCategory::class.java).equalTo("parent_id",parentID).sort("order").findAll()
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
-
-
-    suspend fun insertAssignRawFieldsLable(fieldsLabelAssign: FieldsLabelAssign) {
-
+    suspend fun insertSearchFlows(searchFlows: RealmList<SearchFlow?>) {
         val realm = Realm.getDefaultInstance()
         realm.executeTransactionAwait(Dispatchers.IO) { realmTransaction ->
-            val fullData = FieldsLabelAssign(fieldsLabelAssign.field_name,fieldsLabelAssign.label_ar,fieldsLabelAssign.label_en)
+            for(i in 0 until searchFlows.size){
+            val fullData = SearchFlow(searchFlows[i]?.category_id,searchFlows[i]?.order)
             realmTransaction.insertOrUpdate(fullData)
+            }
         }
+        realm.close()
     }
 
-    fun retrieveAssignRawFieldsLable(): RealmResults<FieldsLabelAssign>? {
-        val realm = Realm.getDefaultInstance()
-        return realm.where(FieldsLabelAssign::class.java).findAll()
-    }
-
-    fun retrieveAssignRawFieldsLable(order:String): FieldsLabelAssign? {
-        val realm = Realm.getDefaultInstance()
-        return realm.where(FieldsLabelAssign::class.java).equalTo("field_name",order).findFirst()
-    }
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-
-    suspend fun insertAssignRawSearchFlow(searchFlow: SearchFlow) {
-        val realm = Realm.getDefaultInstance()
-        realm.executeTransactionAwait(Dispatchers.IO) { realmTransaction ->
-            val fullData = SearchFlow(searchFlow.category_id,searchFlow.order)
-            realmTransaction.insertOrUpdate(fullData)
-        }
-    }
-
-    fun retrieveAssignRawSearchFlow(): RealmResults<SearchFlow>? {
+    fun retrieveSearchFlows(): RealmResults<SearchFlow>? {
         val realm = Realm.getDefaultInstance()
         return realm.where(SearchFlow::class.java).findAll()
     }
-    fun retrieveAssignRawSearchFlow(categID:Int): SearchFlow? {
+    fun retrieveSearchFlow(categID:Int): SearchFlow? {
         val realm = Realm.getDefaultInstance()
         return realm.where(SearchFlow::class.java).equalTo("category_id",categID).findFirst()
 
     }
 
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    suspend fun insertFieldsLable(fieldsLabel: RealmList<FieldLabel?>) {
+
+        val realm = Realm.getDefaultInstance()
+        realm.executeTransactionAwait(Dispatchers.IO) { realmTransaction ->
+            for(i in 0 until fieldsLabel.size){
+            val fullData = FieldLabel(fieldsLabel[i]?.field_name,fieldsLabel[i]?.label_ar,fieldsLabel[i]?.label_en)
+            realmTransaction.insertOrUpdate(fullData)
+            }
+        }
+        realm.close()
+    }
+
+    fun retrieveFieldsLable(): RealmResults<FieldLabel>? {
+        val realm = Realm.getDefaultInstance()
+        return realm.where(FieldLabel::class.java).findAll()
+    }
+
+    fun retrieveFieldLable(order:String): FieldLabel? {
+        val realm = Realm.getDefaultInstance()
+        return realm.where(FieldLabel::class.java).equalTo("field_name",order).findFirst()
+    }
+
 
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    suspend fun insertRawFieldOption(fieldOption: FieldOption) {
+    suspend fun insertFieldsOption(fieldsOption: RealmList<FieldOption?>) {
         val realm = Realm.getDefaultInstance()
         realm.executeTransactionAwait(Dispatchers.IO) { realmTransaction ->
-            val fullData = FieldOption(fieldOption.id,fieldOption.name,fieldOption.data_type,fieldOption.parent_id,fieldOption.parent_name)
+            for(i in 0 until fieldsOption.size){
+            val fullData = FieldOption(fieldsOption[i]?.id,fieldsOption[i]?.name,fieldsOption[i]?.data_type,fieldsOption[i]?.parent_id,fieldsOption[i]?.parent_name)
             realmTransaction.insertOrUpdate(fullData)
+            }
         }
+        realm.close()
     }
 
-    fun retrieveRawFieldOption(): RealmResults<FieldOption>? {
+    fun retrieveFieldsOption(): RealmResults<FieldOption>? {
         val realm = Realm.getDefaultInstance()
         return realm.where(FieldOption::class.java).findAll()
     }
 
-    fun retrieveFieldOptionWithParentID(id:Int): FieldOption? {
+    fun retrieveFieldsOption(id:Int): RealmResults<FieldOption>? {
         val realm = Realm.getDefaultInstance()
         return realm.where(FieldOption::class.java).
         equalTo("parent_id",id).
-        findFirst()
+        findAll()
     }
 
-    fun retrieveRawFieldOption(name:String,parentID: Int): FieldOption? {
+    fun retrieveFieldOption(name:String, parentID: Int): FieldOption? {
         val realm = Realm.getDefaultInstance()
         return realm.where(FieldOption::class.java)
             .equalTo("name",name)
@@ -116,17 +125,11 @@ open class Operations() {
             .findFirst()
     }
 
-    fun retrieveAllOption(): RealmResults<Option>? {
-        val realm = Realm.getDefaultInstance()
-        return realm.where(Option::class.java)
-            .findAll()
-    }
-
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////
 
-    suspend fun insertOptionRawOption(option: RealmList<Option?>) {
+    suspend fun insertOptions(option: RealmList<Option?>) {
         val realm = Realm.getDefaultInstance()
         realm.executeTransactionAwait(Dispatchers.IO) { realmTransaction ->
             for(i in 0 until option.size){
@@ -136,21 +139,23 @@ open class Operations() {
       }
     }
 
-    fun retrieveOptionRawOption(): RealmResults<Option>? {
+    fun retrieveOptions(): RealmResults<Option>? {
         val realm = Realm.getDefaultInstance()
         return realm.where(Option::class.java).findAll()
     }
 
 
-    fun retrieveOptionWithParentNull(field_id:String, parent_id: String?): RealmResults<Option>? {
-        val zer0="0"
+
+    fun retrieveOptions(field_id:String, parent_id: String?): RealmResults<Option>? {
+        val zero="0"
         val realm = Realm.getDefaultInstance()
         return realm.where(Option::class.java)
             .equalTo("field_id",field_id)
             .equalTo("parent_id",parent_id)
             .or()
-            .equalTo("parent_id",zer0)
+            .equalTo("parent_id",zero)
             .findAll()
     }
+
 }
 

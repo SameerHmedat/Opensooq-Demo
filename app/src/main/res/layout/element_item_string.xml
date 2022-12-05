@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="@color/white"
-    android:orientation="horizontal"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:orientation="horizontal">
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingEnd="12dp"
-        android:paddingStart="2dp"
         android:background="@color/white"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingStart="2dp"
+        android:paddingEnd="12dp">
 
 
         <com.google.android.material.card.MaterialCardView
@@ -22,12 +22,12 @@
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_margin="10dp"
-            app:cardCornerRadius="40dp"
             android:checkable="true"
-            app:rippleColor="@color/sky"
+            app:cardCornerRadius="40dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:rippleColor="@color/sky"
             app:strokeColor="@color/sky"
             app:strokeWidth="0dp">
 
@@ -36,12 +36,12 @@
                 android:layout_height="wrap_content">
 
                 <TextView
-                    android:id="@+id/stringText"
+                    android:id="@+id/txtCardString"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
                     android:background="#EEEEEE"
                     android:gravity="center"
-                    android:text="H-1 starex"
+                    android:text="@string/h_1_starex"
                     android:textColor="@color/black"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -55,9 +55,10 @@
             android:id="@+id/CardStringCheck"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:contentDescription="@string/cardIconDes"
             android:elevation="4dp"
-            android:visibility="gone"
             android:src="@drawable/ic_baseline_check_circle_24"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="@+id/CardString"
             app:layout_constraintStart_toEndOf="@+id/CardString"
             app:layout_constraintTop_toTopOf="@+id/CardString" />

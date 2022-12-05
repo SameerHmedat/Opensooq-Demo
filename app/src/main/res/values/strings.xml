@@ -4,4 +4,23 @@
     <string name="any">Any</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="from">From</string>
+    <string name="to">To</string>
+    <string name="any_">Any</string>
+    <string name="cancel">Cancel</string>
+    <string name="screen_size">Screen Size</string>
+    <string name="cars_and_bikes">Cars and Bikes</string>
+    <string name="imageCategory">ImageCategory</string>
+    <string name="cars_for_sale">Cars for Sale</string>
+    <string name="h_1_starex">H-1 starex</string>
+    <string name="cardIconDes">CardIconDes</string>
+    <string name="any__">Any</string>
+    <string name="search">search</string>
+    <string name="search_for_category_or_subcategory">search for category or subcategory</string>
+    <string name="model__">Model</string>
+    <string name="model____">Model</string>
+    <string name="cancel_">Cancel</string>
+    <string name="reset_">Reset</string>
+    <string name="done_">Done</string>
+    <string name="image">Image</string>
 </resources>

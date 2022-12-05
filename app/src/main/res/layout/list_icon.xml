@@ -22,7 +22,7 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/string_icon_title"
+                android:id="@+id/titleIcon"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingStart="12dp"
@@ -56,7 +56,7 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/string_icon_SubTitle"
+                    android:id="@+id/subTitleIcon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
@@ -68,11 +68,12 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <ImageView
-                    android:id="@+id/imgNavigationNextStringOfIcon"
+                    android:id="@+id/openDialogIcon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="250dp"
                     android:clickable="true"
+                    android:contentDescription="@string/imageCategory"
                     android:src="@drawable/ic_baseline_navigate_next_24"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />

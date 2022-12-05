@@ -6,6 +6,6 @@ import io.realm.RealmObject
 
 open class DataAssign(
     @SerializedName("fields_labels")
-    var fields_labels: RealmList<FieldsLabelAssign?>?=null,
+    var fields_labels: RealmList<FieldLabel?>?=null,
     var search_flow: RealmList<SearchFlow?>?=null
 ):RealmObject()

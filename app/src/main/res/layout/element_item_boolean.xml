@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-    <androidx.appcompat.widget.AppCompatButton
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/txtBoolean"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingStart="3dp"
-        android:paddingEnd="3dp"
-        android:background="@drawable/textviewbackground"
-        android:text="@string/any"
-        android:textColor="@color/Gray"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        />
+<androidx.appcompat.widget.AppCompatButton xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/txtBoolean"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/textboolean_background"
+    android:paddingStart="3dp"
+    android:paddingEnd="3dp"
+    android:text="@string/any"
+    android:textAllCaps="false"
+    android:textColor="@color/Gray"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent" />
 

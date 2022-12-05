@@ -16,15 +16,8 @@ class StringAdapter(
 ) :
     RecyclerView.Adapter<StringAdapter.StringViewHolder>() {
 
-    private lateinit var mListener: OnItemClickedListener
+    var onStringClick: (() -> Unit)? = null
 
-    interface OnItemClickedListener {
-        fun onItemClick(position: Int)
-    }
-
-    fun setOnItemClickListener(listener: OnItemClickedListener) {
-        mListener = listener
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StringViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(
@@ -35,7 +28,7 @@ class StringAdapter(
 
     override fun onBindViewHolder(holder: StringViewHolder, position: Int) {
         val currentItem: Option = options[position]
-        holder.bind(currentItem, mListener)
+        holder.bind(currentItem)
 
     }
 
@@ -43,17 +36,17 @@ class StringAdapter(
         return options.size
     }
 
-    class StringViewHolder(itemView: View, val selectedOptions: MutableSet<String>) :
+    inner class StringViewHolder(itemView: View, val selectedOptions: MutableSet<String>) :
         RecyclerView.ViewHolder(itemView) {
 
         @SuppressLint("SuspiciousIndentation")
-        fun bind(option: Option, mListener: OnItemClickedListener) {
-            itemView.stringText.text = option.label_en
+        fun bind(option: Option) {
+            itemView.txtCardString.text = option.label_en
 
             updateCell(option)
             itemView.CardString.setOnClickListener {
                 selectedOptions.addRemove(option.id.orEmpty())
-                mListener.onItemClick(adapterPosition)
+                onStringClick?.invoke()
                 updateCell(option)
             }
         }
@@ -69,7 +62,6 @@ class StringAdapter(
             } else {
                 itemView.CardString.strokeWidth = 0
                 itemView.CardStringCheck.visibility = View.GONE
-                itemView.CardString
             }
         }
     }

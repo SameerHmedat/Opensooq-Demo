@@ -8,28 +8,26 @@ import com.example.opensooqdemo.ThirdActivity
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.custom_dialog_taps.*
 
-class DialogNumeric(
+class NumericDialog(
     private val fieldOptionModel: FieldOptionModel,
     context: Context
 ) {
-    private lateinit var listener: DialogListener
     val dialog = Dialog(context)
+    var dialogNumericListener: ((String) -> Unit)? = null
 
-    fun showDialog(activity: ThirdActivity) {
+    fun showNumericDialog(activity: ThirdActivity) {
         dialog.setContentView(R.layout.custom_dialog_taps)
-        val adapter = ViewPagerAdapter(
-          fieldOptionModel,activity
+        val viewPagerAdapter = ViewPagerAdapter(
+            fieldOptionModel, activity
         )
 
-        dialog.viewPager2.adapter = adapter
+        dialog.viewPager2.adapter = viewPagerAdapter
 
-        adapter.setViewDialog(object : ViewPagerAdapter.ViewListener{
-            override fun applyDialog(value: String) {
-               listener.applyDialog(value)
-                dialog.dismiss()
-            }
+        viewPagerAdapter.viewPagerListener={ value->
+            dialogNumericListener?.invoke(value)
+            dialog.dismiss()
+        }
 
-        })
         TabLayoutMediator(dialog.tab_layout, dialog.viewPager2) { tab, position ->
             when (position) {
                 0 -> {
@@ -51,13 +49,6 @@ class DialogNumeric(
 
     }
 
-    fun setResultDialog(dialogResult: DialogListener) {
-        listener = dialogResult
-    }
-
-    interface DialogListener {
-        fun applyDialog(value: String)
-    }
 
 
 }

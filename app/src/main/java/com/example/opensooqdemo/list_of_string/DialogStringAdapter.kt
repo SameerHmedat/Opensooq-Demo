@@ -7,8 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.opensooqdemo.R
 import com.example.opensooqdemo.exts.addRemove
 import com.example.opensooqdemo.option_raw.Option
-import kotlinx.android.synthetic.main.element_dialogbox_stringclass.view.checkBoxDialogString
-import kotlinx.android.synthetic.main.element_dialogbox_stringclass.view.txtDialogString
+import kotlinx.android.synthetic.main.element_dialog_item_string.view.*
 
 class DialogStringAdapter (var options: List<Option>, val selectedOptions: MutableSet<String> = mutableSetOf()) :
 RecyclerView.Adapter<DialogStringAdapter.CustomDialogStringViewHolder>() {
@@ -16,7 +15,7 @@ RecyclerView.Adapter<DialogStringAdapter.CustomDialogStringViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CustomDialogStringViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(
-            R.layout.element_dialogbox_stringclass, parent, false
+            R.layout.element_dialog_item_string, parent, false
         )
         return CustomDialogStringViewHolder(itemView,selectedOptions)
     }

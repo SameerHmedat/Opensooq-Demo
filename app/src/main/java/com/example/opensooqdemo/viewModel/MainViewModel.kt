@@ -8,36 +8,25 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.opensooqdemo.assign_raw.AssignRaw
 import com.example.opensooqdemo.categories.CategoriesAndSub
+import com.example.opensooqdemo.constants.Constants.dataOperation
 import com.example.opensooqdemo.option_raw.OptionRaw
-import com.example.opensooqdemo.realmManager.Operations
 import com.google.gson.Gson
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.io.InputStream
 import java.nio.charset.Charset
 
 class MainViewModel : ViewModel() {
 
-    private val databaseOperations = Operations()
 
-    var categoriesList: CategoriesAndSub? = null
+    private var categoriesList: CategoriesAndSub? = null
 
-    var assignRawList: AssignRaw? = null
+    private var assignRawList: AssignRaw? = null
 
-    var optionRawList: OptionRaw? = null
+    private var optionRawList: OptionRaw? = null
 
-    private lateinit var mListener: FinishInsertion
-
-    interface FinishInsertion {
-        fun onFinish()
-    }
-
-    fun finishCallBack(listener: FinishInsertion) {
-        mListener = listener
-    }
+    var finishInsertion: (() -> Unit)? = null
 
     @SuppressLint("SuspiciousIndentation")
     fun getCategories(activity: Activity) {
@@ -46,51 +35,40 @@ class MainViewModel : ViewModel() {
             try {
                 categoriesList = Gson().fromJson(json, CategoriesAndSub::class.java)
             } catch (e: Exception) {
-                Log.e("error parsing", e.toString())
+                Log.e("error parsing categoriesAndsubCategories", e.toString())
             }
 
-            val emptyOrNot = databaseOperations.retrieveDataItemCategoryRealmObject()
+            val emptyOrNot = dataOperation.retrieveCategories()
             if (emptyOrNot?.size == 0) {
-                for (i in 0 until categoriesList?.result?.dataCateg?.itemCategs?.size!!) {
-                    categoriesList!!.result!!.dataCateg!!.itemCategs?.get(i)?.let {
-                        databaseOperations.insertCategoryData(
-                            it
-                        )
-                    }
+                categoriesList?.result?.dataCateg?.itemCategs?.let {
+                    dataOperation.insertCategoryData(
+                        it
+                    )
                 }
-            } else {
-                Log.d(
-                    "size of categoriesList",
-                    "${categoriesList?.result?.dataCateg?.itemCategs?.size!!}"
-                )
             }
 
             val json2 = readFromAsset(activity, "dynamic-attributes-assign-raw.json")
             try {
                 assignRawList = Gson().fromJson(json2, AssignRaw::class.java)
             } catch (e: Exception) {
-                Log.e("error parsing", e.toString())
+                Log.e("error parsing dynamic-attributes-assign-raw", e.toString())
             }
 
-            val emptyOrNot3 = databaseOperations.retrieveAssignRawSearchFlow()
-            if (emptyOrNot3?.size == 0) {
-                for (i in 0 until assignRawList?.result?.data?.search_flow?.size!!) {
-                    assignRawList!!.result?.data!!.search_flow?.get(i)?.let {
-                        databaseOperations.insertAssignRawSearchFlow(
-                            it
-                        )
-                    }
+            val emptyOrNot1 = dataOperation.retrieveSearchFlows()
+            if (emptyOrNot1?.size == 0) {
+                assignRawList?.result?.data?.search_flow?.let {
+                    dataOperation.insertSearchFlows(
+                        it
+                    )
                 }
             }
 
-            val emptyOrNot4 = databaseOperations.retrieveAssignRawFieldsLable()
-            if (emptyOrNot4?.size == 0) {
-                for (i in 0 until assignRawList?.result?.data?.fields_labels?.size!!) {
-                    assignRawList!!.result?.data!!.fields_labels?.get(i)?.let {
-                        databaseOperations.insertAssignRawFieldsLable(
-                            it
-                        )
-                    }
+            val emptyOrNot2 = dataOperation.retrieveFieldsLable()
+            if (emptyOrNot2?.size == 0) {
+                assignRawList?.result?.data?.fields_labels?.let {
+                    dataOperation.insertFieldsLable(
+                        it
+                    )
                 }
             }
 
@@ -98,31 +76,25 @@ class MainViewModel : ViewModel() {
             try {
                 optionRawList = Gson().fromJson(json3, OptionRaw::class.java)
             } catch (e: Exception) {
-                Log.d("error parsing", e.toString())
+                Log.d("error parsing dynamic-attributes-and-options-raw", e.toString())
             }
 
-            val emptyOrNot1 = databaseOperations.retrieveRawFieldOption()
-            if (emptyOrNot1 != null) {
-                for (i in 0 until optionRawList?.result?.data?.fields?.size!!) {
-                    optionRawList?.result?.data?.fields?.get(i).let {
-                        if (it != null) {
-                            databaseOperations.insertRawFieldOption(it)
-                        }
-                    }
+            val emptyOrNot3 = dataOperation.retrieveFieldsOption()
+            if (emptyOrNot3?.size == 0) {
+                optionRawList?.result?.data?.fields?.let {
+                    dataOperation.insertFieldsOption(it)
                 }
             }
 
-            val emptyOrNot2 = databaseOperations.retrieveOptionRawOption()
-            if (emptyOrNot2 != null) {
+            val emptyOrNot4 = dataOperation.retrieveOptions()
+            if (emptyOrNot4?.size == 0) {
                 optionRawList?.result?.data?.options?.let {
-                    databaseOperations.insertOptionRawOption(it)
+                    dataOperation.insertOptions(it)
                 }
-                mListener.onFinish()
             }
+            finishInsertion?.invoke()
         }
     }
-
-
 
 
     private fun readFromAsset(activity: Activity, fileName: String): String {

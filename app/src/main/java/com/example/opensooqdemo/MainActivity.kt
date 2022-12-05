@@ -6,40 +6,37 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.opensooqdemo.realmManager.Operations
-import com.example.opensooqdemo.realmManager.RealmCategoryAdapter
+import com.example.opensooqdemo.constants.Constants.dataOperation
+import com.example.opensooqdemo.realm.RealmCategoryAdapter
 import kotlinx.android.synthetic.main.activity_main.*
 
 
 class MainActivity : AppCompatActivity() {
 
-    private var myAdapter: RealmCategoryAdapter? = null
+    private var realmCategoryAdapter: RealmCategoryAdapter? = null
 
-    private val databaseOperations = Operations()
 
     @SuppressLint("SuspiciousIndentation")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-
-        val dataReal = databaseOperations.retrieveDataItemCategoryRealmObject()
-        myAdapter = RealmCategoryAdapter(dataReal)
+        val categories = dataOperation.retrieveCategories()
+        realmCategoryAdapter = RealmCategoryAdapter(data = categories)
         rvCategories.layoutManager = LinearLayoutManager(this)
         rvCategories.setHasFixedSize(false)
-        rvCategories.adapter = myAdapter
+        rvCategories.adapter = realmCategoryAdapter
 
-        myAdapter?.setOnItemClickListener(object : RealmCategoryAdapter.OnItemClickedListener {
-            override fun onItemClick(position: Int) {
-                val intent = Intent(this@MainActivity, SecondActivity::class.java)
-                val parentId = dataReal!![position]?.id
-                val label = dataReal[position]?.label_en
-                intent.putExtra("ID", parentId)
-                intent.putExtra("lable", label)
-                intent.putExtra("position", position)
-                startActivity(intent)
-            }
-        })
+        realmCategoryAdapter?.categoryClick={ position->
+            val intent = Intent(this@MainActivity, SecondActivity::class.java)
+            val parentId = categories!![position]?.id
+            val label = categories[position]?.label_en
+            intent.putExtra("ID", parentId)
+            intent.putExtra("lable", label)
+            intent.putExtra("position", position)
+            startActivity(intent)
+
+        }
     }
 
     override fun onBackPressed() {

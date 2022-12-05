@@ -1,46 +1,43 @@
 package com.example.opensooqdemo.list_of_string
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.opensooqdemo.FieldOptionModel
 import com.example.opensooqdemo.R
-import kotlinx.android.synthetic.main.custom_dialogbox.*
+import kotlinx.android.synthetic.main.custom_dialog_icon_or_string.*
 
-class DialogString(val fieldOptionEn: FieldOptionModel) {
+class DialogString(private val fieldOptionModel: FieldOptionModel) {
 
-    private lateinit var listener: ClassDialogStringListener
+    var onDialogStringClick: (() -> Unit)? = null
 
+
+    @SuppressLint("NotifyDataSetChanged")
     fun showDialog(context: Context) {
         val dialog = Dialog(context)
         dialog.setCancelable(false)
-        dialog.setContentView(R.layout.custom_dialogbox)
-        dialog.ModelDialog.text = fieldOptionEn.LableEN
-        dialog.txtInputLayoutSearchDialogBox.hint = fieldOptionEn.LableEN
+        dialog.setContentView(R.layout.custom_dialog_icon_or_string)
+        dialog.ModelDialog.text = fieldOptionModel.LableEN
+        dialog.txtInputLayoutSearchDialogBox.hint = fieldOptionModel.LableEN
         dialog.rvCustomDialog.layoutManager = LinearLayoutManager( dialog.rvCustomDialog.context)
         dialog.rvCustomDialog.setHasFixedSize(true)
-        val myNewCustomAdapter = DialogStringAdapter(fieldOptionEn.options,fieldOptionEn.selectedOptions)
-        dialog.rvCustomDialog.adapter = myNewCustomAdapter
+        val dialogStringAdapter = DialogStringAdapter(fieldOptionModel.options,fieldOptionModel.selectedOptions)
+        dialog.rvCustomDialog.adapter = dialogStringAdapter
 
         dialog.CancelDialog.setOnClickListener {
             dialog.dismiss()
         }
         dialog.DoneDialog.setOnClickListener {
-            listener.applyDialog()
+            onDialogStringClick?.invoke()
             dialog.dismiss()
         }
         dialog.ResetDialog.setOnClickListener {
-            fieldOptionEn.selectedOptions.clear()
-            myNewCustomAdapter.notifyDataSetChanged()
+            fieldOptionModel.selectedOptions.clear()
+            dialogStringAdapter.notifyDataSetChanged()
         }
         dialog.show()
     }
 
-    fun setDialogResult(dialogResult: ClassDialogStringListener) {
-        listener = dialogResult
-    }
 
-    interface ClassDialogStringListener {
-        fun applyDialog()
-    }
 }

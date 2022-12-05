@@ -13,49 +13,55 @@ import kotlinx.android.synthetic.main.element_item_icon.view.*
 
 
 class IconAdapter(
-    var options: List<Option>,
-    val selectedOptions: MutableSet<String> = mutableSetOf()
+
+    val options: List<Option>,
+    val selectedOptions: MutableSet<String> = mutableSetOf(),
+//    val adapterOnClick: () -> Unit
 ) :
     RecyclerView.Adapter<IconAdapter.StringIconViewHolder>() {
 
-    private lateinit var mListener: OnItemClickedListener
 
-    interface OnItemClickedListener {
-        fun onItemClick(position: Int)
-    }
-
-    fun setOnItemClickListener(listener: OnItemClickedListener) {
-        mListener = listener
-    }
+    var onIconClick: (() -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StringIconViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(
             R.layout.element_item_icon, parent, false
         )
-
         return StringIconViewHolder(itemView, selectedOptions)
     }
 
     override fun onBindViewHolder(holder: StringIconViewHolder, position: Int) {
         val currentItem: Option = options[position]
-        holder.bind(currentItem, mListener)
+        holder.bind(currentItem)
     }
 
     override fun getItemCount(): Int {
         return options.size
     }
 
-    class StringIconViewHolder(itemView: View, val selectedOptions: MutableSet<String>) :
+    inner class StringIconViewHolder(itemView: View, val selectedOptions: MutableSet<String>) :
         RecyclerView.ViewHolder(itemView) {
 
-        fun bind(option: Option, mListener: OnItemClickedListener) {
-            Glide.with(itemView).load(IMAGE_BASE + option.option_img)
-                .into(itemView.stringIconImage)
+        fun bind(option: Option) {
 
+            when (option.id) {
+                "-1" -> {
+                    itemView.CardIconImage.visibility=View.GONE
+                    itemView.txtCardIcon.visibility=View.VISIBLE
+                }
+
+                else -> {
+                    itemView.CardIconImage.visibility=View.VISIBLE
+                    itemView.txtCardIcon.visibility=View.GONE
+
+                    Glide.with(itemView).load(IMAGE_BASE + option.option_img)
+                        .into(itemView.CardIconImage)
+                }
+            }
             updateCell(option)
             itemView.CardIcon.setOnClickListener {
                 selectedOptions.addRemove(option.id.orEmpty())
-                mListener.onItemClick(adapterPosition)
+                onIconClick?.invoke()
                 updateCell(option)
             }
         }
@@ -71,7 +77,6 @@ class IconAdapter(
             } else {
                 itemView.CardIcon.strokeWidth = 0
                 itemView.CardIconCheck.visibility = View.GONE
-                itemView.CardIcon
             }
         }
     }

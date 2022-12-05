@@ -1,22 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardOfIconLayout"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="@color/white"
-    android:orientation="horizontal"
-    android:id="@+id/cardOfStringIconLinearLayout"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:orientation="horizontal">
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingEnd="12dp"
-        android:paddingStart="2dp"
         android:background="@color/white"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingStart="2dp"
+        android:paddingEnd="12dp">
 
 
         <com.google.android.material.card.MaterialCardView
@@ -24,12 +23,12 @@
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_margin="10dp"
-            app:cardCornerRadius="40dp"
             android:checkable="true"
-            app:rippleColor="@color/sky"
+            app:cardCornerRadius="40dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:rippleColor="@color/sky"
             app:strokeColor="@color/sky"
             app:strokeWidth="0dp">
 
@@ -38,14 +37,29 @@
                 android:layout_height="wrap_content">
 
                 <ImageView
-                    android:id="@+id/stringIconImage"
+                    android:id="@+id/CardIconImage"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:background="#EEEEEE"
+                    android:contentDescription="@string/cardIconDes"
+                    android:gravity="center"
+                    android:src="@drawable/car"
+                    android:text="@string/h_1_starex"
+                    android:textColor="@color/black"
+                    android:visibility="visible"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/txtCardIcon"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
                     android:background="#EEEEEE"
                     android:gravity="center"
-                    android:text="H-1 starex"
-                    android:src="@drawable/car"
+                    android:text="@string/any"
                     android:textColor="@color/black"
+                    android:visibility="gone"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -58,9 +72,10 @@
             android:id="@+id/CardIconCheck"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:contentDescription="@string/cardIconDes"
             android:elevation="4dp"
-            android:visibility="gone"
             android:src="@drawable/ic_baseline_check_circle_24"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="@+id/CardIcon"
             app:layout_constraintStart_toEndOf="@+id/CardIcon"
             app:layout_constraintTop_toTopOf="@+id/CardIcon" />

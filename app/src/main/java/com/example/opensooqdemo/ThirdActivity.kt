@@ -1,15 +1,15 @@
 package com.example.opensooqdemo
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
-import android.view.WindowManager
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.opensooqdemo.constants.Constants.dataOperation
 import com.example.opensooqdemo.option_raw.FieldOption
-import com.example.opensooqdemo.realmManager.Operations
+import com.example.opensooqdemo.option_raw.Option
 import kotlinx.android.synthetic.main.activity_third.*
 
 class ThirdActivity : AppCompatActivity() {
@@ -17,7 +17,7 @@ class ThirdActivity : AppCompatActivity() {
     private val adapterList by lazy { LargeAdapter() }
 
 
-    @SuppressLint("SuspiciousIndentation")
+    @SuppressLint("SuspiciousIndentation", "NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_third)
@@ -29,117 +29,135 @@ class ThirdActivity : AppCompatActivity() {
 
         changingStatusColor()
 
-        val bundleID = intent.extras?.getInt("itemID")
+        val subCategoryID = intent.extras?.getInt("SubCategoryID")
 
-        val dataOperations = Operations()
+        val searchFlow = dataOperation.retrieveSearchFlow(categID = subCategoryID!!)
 
-        val mySearchFlowNormal = dataOperations.retrieveAssignRawSearchFlow(bundleID!!)
+        if (searchFlow == null) {
+            val builder = AlertDialog.Builder(this)
+            builder.setMessage("This category is not found")
+            builder.setTitle("Attention !!")
+            builder.setCancelable(false)
+            builder.setNegativeButton("back") { _, _ ->
+                onBackPressed()
+            }
 
-        if (mySearchFlowNormal == null) {
-            Toast.makeText(
-                this@ThirdActivity,
-                "This category is not found",
-                Toast.LENGTH_SHORT
-            ).show()
+            val alertDialog = builder.create()
+            alertDialog.show()
 
         } else {
 
             val results = arrayListOf<FieldOptionModel>()
 
-            for (i in 0 until mySearchFlowNormal.order!!.size) {
+            for (i in 0 until searchFlow.order!!.size) {
 
-                val assignRawFieldLable =
-                    dataOperations.retrieveAssignRawFieldsLable(mySearchFlowNormal.order!![i]!!)
+                val fieldLable =
+                    dataOperation.retrieveFieldLable(order = searchFlow.order!![i].orEmpty())?.label_en
 
-                val rawFieldOption =
-                    dataOperations.retrieveRawFieldOption(mySearchFlowNormal.order!![i]!!, 0)
+                val fieldOption =
+                    dataOperation.retrieveFieldOption(
+                        name = searchFlow.order!![i].orEmpty(),
+                        parentID = 0
+                    )
 
-                val listofFiledOption =
-                    dataOperations.retrieveOptionWithParentNull(rawFieldOption?.id.toString(), null)
+                val fieldOptionId = fieldOption?.id.toString()
 
-                val filedId = rawFieldOption?.id.toString()
-
-                val options = listofFiledOption?.filter {
-                    it.field_id == filedId
+                val options = dataOperation.retrieveOptions(
+                    field_id = fieldOption?.id.toString(),
+                    parent_id = null
+                )?.filter {
+                    it.field_id == fieldOptionId
                 }
 
-                rawFieldOption?.let { fieldOption ->
-                    assignRawFieldLable?.label_en?.let { label ->
-                        FieldOptionModel(
-                            fieldOption = fieldOption,
-                            options = options.orEmpty(),
-                            selectedOptions = mutableSetOf(),
-                            LableEN = label,
-                        )
-                    }
-                }
-                    ?.let { results.add(it) }
+
+                fieldOption?.let {
+                    FieldOptionModel(
+                        fieldOption = it,
+                        options = updatedOption(options.orEmpty()),
+                        selectedOptions = mutableSetOf(),
+                        LableEN = fieldLable.orEmpty()
+
+                    )
+                }?.let { results.add(it) }
+
             }
 
             for (i in 0 until results.size) {
-                Log.d("sss", results[i].toString())
+                Log.d("FieldOptionModel", results[i].toString())
             }
-            Log.d("sss", results.size.toString())
+            Log.d("size of FieldOptionModel : ", results.size.toString())
 
             adapterList.itemList = results
-            recyclerViewFull.layoutManager = LinearLayoutManager(this@ThirdActivity)
-            recyclerViewFull.adapter = adapterList
+            recyclerViewFull.apply {
+                layoutManager= LinearLayoutManager(this@ThirdActivity)
+                adapter=adapterList
+            }
 
+            adapterList.onTypeIconClick = { fieldOptionModel ->
 
+                val parentFieldOptionID = fieldOptionModel.fieldOption.id.toString() //brand
 
-            adapterList.setType(object : LargeAdapter.OnTypeClick {
-                override fun onClick(fieldOptionEn: FieldOptionModel) {
+                val childrenFieldOption =
+                    dataOperation.retrieveFieldsOption(id = parentFieldOptionID.toInt()) //for example brand_child
 
-                    val fieldID = fieldOptionEn.fieldOption.id.toString() //Brand
-                    val dataOperation = Operations()
-                    val fieldOption = dataOperation.retrieveFieldOptionWithParentID(fieldID.toInt())
+                if (childrenFieldOption != null) {
+                    for (k in 0 until childrenFieldOption.size) {
+                        removeElement(fieldOption = childrenFieldOption[k])
 
-                    removeElement(fieldOption)
+                        if (fieldOptionModel.selectedOptions.size == 1) {
 
-                    if (fieldOptionEn.selectedOptions.size == 1) {
-                        var clickedID: String? = null// for example Kia
+                            val optionID =
+                                fieldOptionModel.selectedOptions.first()  //because I am sure I have one Option selected for example KIA
 
-                        val filterOptions = fieldOptionEn.options.filter {
-                            fieldOptionEn.selectedOptions.contains(it.id)
-                        }
-
-                        for (j in 0 until fieldOptionEn.options.size) {
-                            if (fieldOptionEn.options[j].label_en == filterOptions[0].label_en) {
-                                clickedID = fieldOptionEn.options[j].id!!
+                            if (optionID == "-1") {
+                                break
                             }
-                        }
 
-                        val allOptions = dataOperation.retrieveAllOption()
-                        val updatedOptions = allOptions?.filter { it ->
-                            it.parent_id == clickedID
-                        }
+                            var position = -1
+                            for (y in 0 until searchFlow.order!!.size) {
+                                if (childrenFieldOption[k]?.name == searchFlow.order!![y]) {
+                                    position = y //compare child_brand with position in orders
+                                    break
+                                }
+                            }
 
-                        val fieldEnglish = fieldOption?.name?.let {
-                            dataOperation.retrieveAssignRawFieldsLable(
-                                it
-                            )
-                        }?.label_en
 
-                        fieldOption?.let {
-                            updatedOptions?.let { it1 ->
+                            val allOptions = dataOperation.retrieveOptions()
+
+                            val options = allOptions?.filter { option ->
+                                option.parent_id == optionID
+                            } //Asia,Avila,optima
+                            val updatedOptions = options?.let { updatedOption(it) }
+
+                            val fieldLable =
+                                dataOperation.retrieveFieldLable(order = childrenFieldOption[k]?.name.orEmpty())?.label_en
+
+
+                            childrenFieldOption[k]?.let { fieldOption ->
                                 FieldOptionModel(
-                                    fieldOption = it,
-                                    options = it1,
+                                    fieldOption = fieldOption,
+                                    options = updatedOptions.orEmpty(),
                                     selectedOptions = mutableSetOf(),
-                                    LableEN = fieldEnglish.toString(),
+                                    LableEN = fieldLable.orEmpty()
                                 )
                             }
-                        }?.let { adapterList.itemList.add(1, it) }
-                        adapterList.notifyDataSetChanged()
-                    } else {
-                        removeElement(fieldOption)
-                        adapterList.notifyDataSetChanged()
+                                ?.let { fieldOptionModell ->
+                                    adapterList.itemList.add(
+                                        index = position,
+                                        element = fieldOptionModell
+                                    )
+                                }
+                            adapterList.notifyDataSetChanged()
+                        } else {
+                            removeElement(fieldOption = childrenFieldOption[k])
+                            adapterList.notifyDataSetChanged()
+                        }
                     }
                 }
-            })
-
+            }
         }
     }
+
 
     private fun removeElement(fieldOption: FieldOption?) {
         for (t in 0 until adapterList.itemList.size) {
@@ -151,10 +169,29 @@ class ThirdActivity : AppCompatActivity() {
     }
 
 
+    @Suppress("DEPRECATION")
     private fun changingStatusColor() {
         val window = this.window
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
         window.statusBarColor = ContextCompat.getColor(this, R.color.skyDark)
     }
+
+    private fun updatedOption(options: List<Option>): List<Option> {
+        val newOptionsWithAny = ArrayList(options)
+        newOptionsWithAny.add(
+            0,
+            Option(
+                "-1",
+                "",
+                "Any",
+                "Any",
+                "Any",
+                R.drawable.ic_baseline_check_24.toString(),
+                "0",
+                "900099",
+                ""
+            )
+        )
+        return newOptionsWithAny
+    }
+
 }

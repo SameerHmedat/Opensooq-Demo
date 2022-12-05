@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.marginEnd
 import androidx.recyclerview.widget.RecyclerView
 import com.example.opensooqdemo.R
 import com.example.opensooqdemo.exts.addRemove
@@ -13,7 +14,7 @@ import kotlinx.android.synthetic.main.element_item_boolean.view.*
 
 
 class BooleanAdapter(
-    var options: List<Option>,
+    val options: List<Option>,
     val selectedOptions: MutableSet<String> = mutableSetOf()
 ) :
     RecyclerView.Adapter<BooleanAdapter.StringBooleanViewHolder>() {
@@ -62,10 +63,10 @@ class BooleanAdapter(
 
         private fun updateCell(option: Option) {
             if (selectedOptions.contains(option.id)) {
-                itemView.txtBoolean.setBackgroundColor(Color.parseColor("#35B0FB"))
+                itemView.txtBoolean.setBackgroundResource(R.drawable.textboolean_background_sky)
                 itemView.txtBoolean.setTextColor(Color.parseColor("#FFFFFF"))
             } else {
-                itemView.txtBoolean.setBackgroundResource(R.drawable.textviewbackground)
+                itemView.txtBoolean.setBackgroundResource(R.drawable.textboolean_background)
                 itemView.txtBoolean.setTextColor(Color.parseColor("#808080"))
             }
         }

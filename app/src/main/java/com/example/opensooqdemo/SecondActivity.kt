@@ -3,18 +3,15 @@ package com.example.opensooqdemo
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.opensooqdemo.realmManager.Operations
-import com.example.opensooqdemo.realmManager.RealmSubCategoryAdapter
-import com.example.opensooqdemo.viewModel.MainViewModel
+import com.example.opensooqdemo.constants.Constants.dataOperation
+import com.example.opensooqdemo.realm.RealmSubCategoryAdapter
 import kotlinx.android.synthetic.main.activity_second.*
-import kotlinx.android.synthetic.main.activity_third.*
 
 class SecondActivity : AppCompatActivity() {
 
 
-    private var mySecAdapter: RealmSubCategoryAdapter? = null
+    private var realmSubCategoryAdapter: RealmSubCategoryAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,36 +21,30 @@ class SecondActivity : AppCompatActivity() {
             onBackPressed()
         }
 
-        val bundleID = intent.extras?.getInt("ID")
+        val categoryID = intent.extras?.getInt("ID")
         val bundleLable = intent.extras?.getString("lable")
         val positionPrevious = intent.extras?.getInt("position")
 
 
-        val databaseOperations = Operations()
-        val dataReal = databaseOperations.retrieveDataItemSubCategoryRealmObject(bundleID)
-        txtHeader.text = bundleLable.toString()
+        val subCategories = dataOperation.retrieveSubCategories(parentID = categoryID)
+        txtSubCategory.text = bundleLable.orEmpty()
 
 
-        mySecAdapter = RealmSubCategoryAdapter(dataReal)
+        realmSubCategoryAdapter = RealmSubCategoryAdapter(subCategories)
         rvSubCategories.layoutManager = LinearLayoutManager(this)
         rvSubCategories.setHasFixedSize(false)
-        rvSubCategories.adapter = mySecAdapter
+        rvSubCategories.adapter = realmSubCategoryAdapter
 
-        val items = databaseOperations.retrieveDataItemCategoryRealmObject()
+        val items = dataOperation.retrieveCategories()
 
-        mySecAdapter?.setOnItemClickListener(object :
-            RealmSubCategoryAdapter.OnItemClickedListener {
-            override fun onItemClick(position: Int) {
-                val intent = Intent(this@SecondActivity, ThirdActivity::class.java)
-                val itemID = items!![positionPrevious!!]!!.subCategories!![position]!!.id
-                intent.putExtra("itemID", itemID)
-                startActivity(intent)
-            }
-
-        })
-
+        realmSubCategoryAdapter?.subCategoryClick={ position->
+            val intent = Intent(this@SecondActivity, ThirdActivity::class.java)
+            val subCategoryID =
+                positionPrevious?.let { items?.get(it)?.subCategories?.get(position)?.id }
+            intent.putExtra("SubCategoryID", subCategoryID)
+            startActivity(intent)
+        }
 
     }
-
 
 }

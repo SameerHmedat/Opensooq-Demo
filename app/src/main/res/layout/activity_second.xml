@@ -3,9 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:orientation="vertical"
-    android:background="@color/white"
     android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical"
     tools:context=".SecondActivity">
 
     <com.google.android.material.appbar.MaterialToolbar
@@ -13,62 +13,61 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
-        app:title="Select Subcategory"
-        app:navigationIconTint="@color/black"
         app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
-        app:titleTextColor="@color/black"
+        app:navigationIconTint="@color/black"
+        app:title="Select Subcategory"
         app:titleCentered="false"
         app:titleMarginStart="30dp"
-        />
+        app:titleTextColor="@color/black" />
 
 
     <TextView
-        android:id="@+id/txtHeader"
+        android:id="@+id/txtSubCategory"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/black"
-        android:textSize="25dp"
-        android:textStyle="normal"
-        android:text="@string/app_name"
         android:layout_marginStart="8dp"
         android:layout_marginBottom="10dp"
-        />
+        android:text="@string/app_name"
+        android:textColor="@color/black"
+        android:textSize="25sp"
+        android:textStyle="normal" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/txtInputLayoutSubCategory"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:background="@color/white"
+        android:hint="@string/search"
         android:textColorHint="#666666"
-        app:hintTextColor="#666666"
-        app:startIconTint="#666666"
-        android:hint="search"
         app:boxStrokeColor="@color/black"
-        app:startIconDrawable="@drawable/ic_baseline_search_24"
         app:endIconMode="clear_text"
-        >
+        app:hintTextColor="#666666"
+        app:startIconDrawable="@drawable/ic_baseline_search_24"
+        app:startIconTint="#666666">
+
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/edt_name_SubCategory"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:endIconMode="clear_text"
-            android:inputType="text"
             android:layout_marginStart="2dp"
             android:layout_marginEnd="2dp"
             android:background="@color/white"
+            android:inputType="text"
+            android:textColor="@color/black"
             android:textCursorDrawable="@drawable/custom_cursor_drawable"
-            android:textColor="@color/black" />
+            app:endIconMode="clear_text" />
 
     </com.google.android.material.textfield.TextInputLayout>
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/white"
-    >
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvSubCategories"
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-</LinearLayout>
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:orientation="vertical">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvSubCategories"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </LinearLayout>
 </LinearLayout>

@@ -11,41 +11,33 @@ import com.example.opensooqdemo.R
 import kotlinx.android.synthetic.main.custom_fragment.*
 
 class CustomFragment(
-    private val fieldOptionModel: FieldOptionModel
+    private val fieldOptionModel: FieldOptionModel,
+    private val fragmentListener: ((String) -> Unit)? = null
 ) : Fragment() {
 
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? { return inflater.inflate(R.layout.custom_fragment, container, false) }
-    private lateinit var fraglistener: FragListener
+    ): View? {
+        return inflater.inflate(R.layout.custom_fragment, container, false)
+    }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
         super.onViewCreated(view, savedInstanceState)
-        titleCustomFragment.text = fieldOptionModel.LableEN
+        txtCustomFragment.text = fieldOptionModel.LableEN
 
         rvCustomFragment.layoutManager = LinearLayoutManager(rvCustomFragment.context)
         rvCustomFragment.setHasFixedSize(true)
 
-        val madapter = TapsAdapter(fieldOptionModel.options)
-        rvCustomFragment.adapter = madapter
+        val numericAdapter = NumericAdapter(fieldOptionModel.options)
+        rvCustomFragment.adapter = numericAdapter
 
-        madapter.setOnItemClickListener(object : TapsAdapter.OnItemClickedListener {
-            override fun onItemClick(position: Int) {
-                    fraglistener.applyPager(madapter.options[position].value.toString())
-            }
-        })
+        numericAdapter.onNumericItemClick = { option ->
+            fragmentListener?.invoke(option.value.orEmpty())
+        }
     }
 
-    fun setResult(dialogResult: FragListener) {
-        fraglistener = dialogResult
-    }
-
-    interface FragListener {
-        fun applyPager(value: String)
-    }
 }
-
-

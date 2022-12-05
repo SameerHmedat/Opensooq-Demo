@@ -1,4 +1,4 @@
-package com.example.opensooqdemo.realmManager
+package com.example.opensooqdemo.realm
 
 import android.app.Application
 import io.realm.Realm
@@ -15,8 +15,7 @@ class General : Application() {
 
 
         val configuration = RealmConfiguration.Builder()
-            .schemaVersion(15)
-            .deleteRealmIfMigrationNeeded()
+            .schemaVersion(1)
             .allowWritesOnUiThread(false)
             .allowQueriesOnUiThread(true)
             .name(realmName)
