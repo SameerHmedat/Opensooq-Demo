@@ -5,14 +5,16 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.opensooqdemo.constants.Constants.dataOperation
 import com.example.opensooqdemo.realm.RealmCategoryAdapter
+import com.example.opensooqdemo.viewModel.MainViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 
 
 class MainActivity : AppCompatActivity() {
 
+    private val viewModel: MainViewModel by lazy { ViewModelProvider(this)[MainViewModel::class.java] }
     private var realmCategoryAdapter: RealmCategoryAdapter? = null
 
 
@@ -21,13 +23,17 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val categories = dataOperation.retrieveCategories()
+        toolbarCategory.setNavigationOnClickListener {
+            backPressed()
+        }
+
+        val categories = viewModel.retrieveCategories()
         realmCategoryAdapter = RealmCategoryAdapter(data = categories)
         rvCategories.layoutManager = LinearLayoutManager(this)
         rvCategories.setHasFixedSize(false)
         rvCategories.adapter = realmCategoryAdapter
 
-        realmCategoryAdapter?.categoryClick={ position->
+        realmCategoryAdapter?.categoryClick = { position ->
             val intent = Intent(this@MainActivity, SecondActivity::class.java)
             val parentId = categories!![position]?.id
             val label = categories[position]?.label_en
@@ -40,6 +46,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
+        backPressed()
+    }
+
+    private fun backPressed() {
         val builder = AlertDialog.Builder(this)
         builder.setMessage("Do you want to exit ?")
         builder.setTitle("Attention !!")
@@ -53,6 +63,5 @@ class MainActivity : AppCompatActivity() {
 
         val alertDialog = builder.create()
         alertDialog.show()
-
     }
 }

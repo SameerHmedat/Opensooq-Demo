@@ -10,11 +10,9 @@ import com.example.opensooqdemo.FieldOptionModel
 import com.example.opensooqdemo.R
 import kotlinx.android.synthetic.main.custom_fragment.*
 
-class CustomFragment(
-    private val fieldOptionModel: FieldOptionModel,
-    private val fragmentListener: ((String) -> Unit)? = null
-) : Fragment() {
+class CustomFragment : Fragment() {
 
+    var fragmentListener: (() -> Unit)? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -27,16 +25,23 @@ class CustomFragment(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
         super.onViewCreated(view, savedInstanceState)
-        txtCustomFragment.text = fieldOptionModel.LableEN
+
+        val fieldOptionModel =
+            arguments?.getParcelable<FieldOptionModel>("fieldOptionModelArgument")
+
+        txtCustomFragment.text = fieldOptionModel?.fieldLableEn
 
         rvCustomFragment.layoutManager = LinearLayoutManager(rvCustomFragment.context)
         rvCustomFragment.setHasFixedSize(true)
 
-        val numericAdapter = NumericAdapter(fieldOptionModel.options)
+        val numericAdapter = NumericAdapter(
+            options = fieldOptionModel?.options.orEmpty(),
+            selectedOptions = fieldOptionModel!!.selectedOptions
+        )
         rvCustomFragment.adapter = numericAdapter
 
-        numericAdapter.onNumericItemClick = { option ->
-            fragmentListener?.invoke(option.value.orEmpty())
+        numericAdapter.onNumericItemClick = {
+            fragmentListener?.invoke()
         }
     }
 

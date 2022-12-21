@@ -10,16 +10,17 @@ import kotlinx.android.synthetic.main.element_dialog_numeric.view.*
 
 class NumericAdapter(
     val options: List<Option>,
+    val selectedOptions: MutableSet<String> = mutableSetOf()
 ) :
     RecyclerView.Adapter<NumericAdapter.NumericViewHolder>() {
 
-    var onNumericItemClick: ((Option) -> Unit)? = null
+    var onNumericItemClick: (() -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NumericViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(
             R.layout.element_dialog_numeric, parent, false
         )
-        return NumericViewHolder(itemView)
+        return NumericViewHolder(itemView, selectedOptions)
     }
 
     override fun onBindViewHolder(holder: NumericViewHolder, position: Int) {
@@ -33,6 +34,7 @@ class NumericAdapter(
 
     inner class NumericViewHolder(
         itemView: View,
+        val selectedOptions: MutableSet<String>,
     ) :
         RecyclerView.ViewHolder(itemView) {
 
@@ -40,7 +42,9 @@ class NumericAdapter(
         fun bind(option: Option) {
             itemView.txtTapValue.text = option.value
             itemView.numericLayout.setOnClickListener {
-                onNumericItemClick?.invoke(options[adapterPosition])
+                selectedOptions.clear()
+                selectedOptions.add(options[adapterPosition].value.orEmpty())
+                onNumericItemClick?.invoke()
             }
         }
     }

@@ -4,6 +4,7 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.example.opensooqdemo.FieldOptionModel
 import com.example.opensooqdemo.ThirdActivity
+import com.example.opensooqdemo.constants.Constants.instanceCustomFragment
 
 
 class ViewPagerAdapter(
@@ -12,7 +13,8 @@ class ViewPagerAdapter(
 ) :
     FragmentStateAdapter(activity.supportFragmentManager, activity.lifecycle) {
 
-    var viewPagerListener: ((String) -> Unit)? = null
+    var viewPagerListener: ((Int) -> Unit)? = null
+
 
     override fun getItemCount(): Int {
         return 2
@@ -20,17 +22,22 @@ class ViewPagerAdapter(
 
     override fun createFragment(position: Int): Fragment {
 
+
         when (position) {
             0 -> {
-                return CustomFragment(fieldOptionModel = fieldOptionModel) { value ->
-                    viewPagerListener?.invoke(value)
+                val customFragment = instanceCustomFragment(fieldOptionModel)
+                customFragment.fragmentListener = {
+                    viewPagerListener?.invoke(position)
                 }
+                return customFragment
             }
 
             1 -> {
-                return CustomFragment(fieldOptionModel = fieldOptionModel) { value ->
-                    viewPagerListener?.invoke(value)
+                val customFragment = instanceCustomFragment(fieldOptionModel)
+                customFragment.fragmentListener = {
+                    viewPagerListener?.invoke(position)
                 }
+                return customFragment
             }
             else -> {
                 return Fragment()

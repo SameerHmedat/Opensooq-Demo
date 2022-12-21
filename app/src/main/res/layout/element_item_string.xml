@@ -12,16 +12,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@color/white"
-        android:orientation="horizontal"
-        android:paddingStart="2dp"
-        android:paddingEnd="12dp">
-
+        >
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/CardString"
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:layout_margin="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
             android:checkable="true"
             app:cardCornerRadius="40dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -30,6 +28,7 @@
             app:rippleColor="@color/sky"
             app:strokeColor="@color/sky"
             app:strokeWidth="0dp">
+
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="wrap_content"
@@ -58,7 +57,7 @@
             android:contentDescription="@string/cardIconDes"
             android:elevation="4dp"
             android:src="@drawable/ic_baseline_check_circle_24"
-            android:visibility="gone"
+            android:visibility="invisible"
             app:layout_constraintEnd_toEndOf="@+id/CardString"
             app:layout_constraintStart_toEndOf="@+id/CardString"
             app:layout_constraintTop_toTopOf="@+id/CardString" />

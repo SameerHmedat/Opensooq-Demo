@@ -6,7 +6,6 @@ import android.content.Context
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.opensooqdemo.FieldOptionModel
 import com.example.opensooqdemo.R
-import com.example.opensooqdemo.option_raw.Option
 import kotlinx.android.synthetic.main.custom_dialog_icon_or_string.*
 
 
@@ -21,9 +20,9 @@ class DialogIcon(
      fun showDialog(context: Context){
         val dialog = Dialog(context)
         dialog.setContentView(R.layout.custom_dialog_icon_or_string)
-        dialog.setCancelable(false)
-        dialog.ModelDialog.text = fieldOptionModel.LableEN
-        dialog.txtInputLayoutSearchDialogBox.hint = fieldOptionModel.LableEN
+        dialog.setCancelable(true)
+        dialog.ModelDialog.text = fieldOptionModel.fieldLableEn
+        dialog.txtInputLayoutSearchDialogBox.hint = fieldOptionModel.fieldLableEn
         dialog.rvCustomDialog.layoutManager = LinearLayoutManager(context)
         dialog.rvCustomDialog.setHasFixedSize(true)
         val dialogIconAdapter = DialogIconAdapter(fieldOptionModel.options,fieldOptionModel.selectedOptions)

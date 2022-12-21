@@ -13,18 +13,19 @@ class NumericDialog(
     context: Context
 ) {
     val dialog = Dialog(context)
-    var dialogNumericListener: ((String) -> Unit)? = null
+    var dialogNumericListener: ((Int) -> Unit)? = null
 
     fun showNumericDialog(activity: ThirdActivity) {
         dialog.setContentView(R.layout.custom_dialog_taps)
         val viewPagerAdapter = ViewPagerAdapter(
-            fieldOptionModel, activity
+            fieldOptionModel = fieldOptionModel,
+            activity = activity
         )
 
         dialog.viewPager2.adapter = viewPagerAdapter
 
-        viewPagerAdapter.viewPagerListener={ value->
-            dialogNumericListener?.invoke(value)
+        viewPagerAdapter.viewPagerListener = { pos: Int ->
+            dialogNumericListener?.invoke(pos)
             dialog.dismiss()
         }
 
@@ -48,7 +49,6 @@ class NumericDialog(
         dialog.show()
 
     }
-
 
 
 }

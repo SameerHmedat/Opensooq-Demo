@@ -4,10 +4,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.example.opensooqdemo.R
 import com.example.opensooqdemo.constants.Constants.IMAGE_BASE
 import com.example.opensooqdemo.exts.addRemove
+import com.example.opensooqdemo.exts.loadImage
 import com.example.opensooqdemo.option_raw.Option
 import kotlinx.android.synthetic.main.element_item_icon.view.*
 
@@ -16,7 +16,6 @@ class IconAdapter(
 
     val options: List<Option>,
     val selectedOptions: MutableSet<String> = mutableSetOf(),
-//    val adapterOnClick: () -> Unit
 ) :
     RecyclerView.Adapter<IconAdapter.StringIconViewHolder>() {
 
@@ -39,23 +38,21 @@ class IconAdapter(
         return options.size
     }
 
-    inner class StringIconViewHolder(itemView: View, val selectedOptions: MutableSet<String>) :
+    inner class StringIconViewHolder(itemView: View, var selectedOptions: MutableSet<String>) :
         RecyclerView.ViewHolder(itemView) {
 
         fun bind(option: Option) {
 
             when (option.id) {
                 "-1" -> {
-                    itemView.CardIconImage.visibility=View.GONE
+                    itemView.CardIconImage.visibility=View.INVISIBLE
                     itemView.txtCardIcon.visibility=View.VISIBLE
                 }
 
                 else -> {
                     itemView.CardIconImage.visibility=View.VISIBLE
                     itemView.txtCardIcon.visibility=View.GONE
-
-                    Glide.with(itemView).load(IMAGE_BASE + option.option_img)
-                        .into(itemView.CardIconImage)
+                    itemView.CardIconImage.loadImage(IMAGE_BASE+option.option_img)
                 }
             }
             updateCell(option)
@@ -67,7 +64,6 @@ class IconAdapter(
         }
 
         private fun updateCell(option: Option) {
-
             itemView.CardIcon.isChecked = selectedOptions.contains(option.id)
             if (itemView.CardIcon.isChecked) {
                 itemView.CardIcon.strokeWidth = 4
@@ -76,7 +72,7 @@ class IconAdapter(
 
             } else {
                 itemView.CardIcon.strokeWidth = 0
-                itemView.CardIconCheck.visibility = View.GONE
+                itemView.CardIconCheck.visibility = View.INVISIBLE
             }
         }
     }

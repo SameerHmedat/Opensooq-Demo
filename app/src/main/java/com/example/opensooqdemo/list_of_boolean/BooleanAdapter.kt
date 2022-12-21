@@ -4,7 +4,6 @@ import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.marginEnd
 import androidx.recyclerview.widget.RecyclerView
 import com.example.opensooqdemo.R
 import com.example.opensooqdemo.exts.addRemove
@@ -19,6 +18,7 @@ class BooleanAdapter(
 ) :
     RecyclerView.Adapter<BooleanAdapter.StringBooleanViewHolder>() {
 
+    var onBooleanClick: (() -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StringBooleanViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(
@@ -38,7 +38,7 @@ class BooleanAdapter(
         return options.size
     }
 
-    class StringBooleanViewHolder(itemView: View, val selectedOptions: MutableSet<String>) :
+    inner class StringBooleanViewHolder(itemView: View, var selectedOptions: MutableSet<String>) :
         RecyclerView.ViewHolder(itemView) {
 
         init {
@@ -57,6 +57,7 @@ class BooleanAdapter(
 
             itemView.txtBoolean.setOnClickListener {
                 selectedOptions.addRemove(option.id.orEmpty())
+                onBooleanClick?.invoke()
                 updateCell(option)
             }
         }

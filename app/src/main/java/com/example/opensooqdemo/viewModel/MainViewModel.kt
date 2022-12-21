@@ -3,14 +3,24 @@ package com.example.opensooqdemo.viewModel
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.util.Log
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.opensooqdemo.FieldOptionModel
+import com.example.opensooqdemo.R
 import com.example.opensooqdemo.assign_raw.AssignRaw
+import com.example.opensooqdemo.assign_raw.FieldLabel
+import com.example.opensooqdemo.assign_raw.SearchFlow
 import com.example.opensooqdemo.categories.CategoriesAndSub
-import com.example.opensooqdemo.constants.Constants.dataOperation
+import com.example.opensooqdemo.categories.ItemCateg
+import com.example.opensooqdemo.categories.SubCategory
+import com.example.opensooqdemo.option_raw.FieldOption
+import com.example.opensooqdemo.option_raw.Option
 import com.example.opensooqdemo.option_raw.OptionRaw
 import com.google.gson.Gson
+import io.realm.Realm
+import io.realm.RealmList
+import io.realm.RealmResults
+import io.realm.kotlin.executeTransactionAwait
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.IOException
@@ -19,82 +29,252 @@ import java.nio.charset.Charset
 
 class MainViewModel : ViewModel() {
 
+    val backupItemsList=arrayListOf<FieldOptionModel>()
+    val backupValuesFrom:HashMap<Int,String> = HashMap()
+    val backupValuesTo:HashMap<Int,String> = HashMap()
 
-    private var categoriesList: CategoriesAndSub? = null
-
+    private var categoriesAndSubList: CategoriesAndSub? = null
     private var assignRawList: AssignRaw? = null
-
     private var optionRawList: OptionRaw? = null
 
     var finishInsertion: (() -> Unit)? = null
 
+
     @SuppressLint("SuspiciousIndentation")
     fun getCategories(activity: Activity) {
         viewModelScope.launch(Dispatchers.IO) {
-            val json = readFromAsset(activity, "categoriesAndsubCategories.json")
+            val jsonCategoriesAndSub = readFromAsset(activity, "categoriesAndsubCategories.json")
             try {
-                categoriesList = Gson().fromJson(json, CategoriesAndSub::class.java)
+                categoriesAndSubList = Gson().fromJson(jsonCategoriesAndSub, CategoriesAndSub::class.java)
             } catch (e: Exception) {
                 Log.e("error parsing categoriesAndsubCategories", e.toString())
             }
 
-            val emptyOrNot = dataOperation.retrieveCategories()
-            if (emptyOrNot?.size == 0) {
-                categoriesList?.result?.dataCateg?.itemCategs?.let {
-                    dataOperation.insertCategoryData(
-                        it
+            val categoriesAndSub = retrieveCategories()
+            if (categoriesAndSub?.size == 0) {
+                categoriesAndSubList?.result?.dataCateg?.itemCategs?.let {
+                    insertCategories(
+                        itemCategories = it
                     )
                 }
             }
 
-            val json2 = readFromAsset(activity, "dynamic-attributes-assign-raw.json")
+            val jsonAssignRaw = readFromAsset(activity, "dynamic-attributes-assign-raw.json")
             try {
-                assignRawList = Gson().fromJson(json2, AssignRaw::class.java)
+                assignRawList = Gson().fromJson(jsonAssignRaw, AssignRaw::class.java)
             } catch (e: Exception) {
                 Log.e("error parsing dynamic-attributes-assign-raw", e.toString())
             }
 
-            val emptyOrNot1 = dataOperation.retrieveSearchFlows()
-            if (emptyOrNot1?.size == 0) {
+            val searchFlows = retrieveSearchFlows()
+            if (searchFlows?.size == 0) {
                 assignRawList?.result?.data?.search_flow?.let {
-                    dataOperation.insertSearchFlows(
-                        it
+                    insertSearchFlows(
+                        searchFlows = it
                     )
                 }
             }
 
-            val emptyOrNot2 = dataOperation.retrieveFieldsLable()
-            if (emptyOrNot2?.size == 0) {
+            val fieldsLabel = retrieveFieldsLable()
+            if (fieldsLabel?.size == 0) {
                 assignRawList?.result?.data?.fields_labels?.let {
-                    dataOperation.insertFieldsLable(
-                        it
+                    insertFieldsLable(
+                        fieldsLabel = it
                     )
                 }
             }
 
-            val json3 = readFromAsset(activity, "dynamic-attributes-and-options-raw.json")
+            val jsonOptionRaw = readFromAsset(activity, "dynamic-attributes-and-options-raw.json")
             try {
-                optionRawList = Gson().fromJson(json3, OptionRaw::class.java)
+                optionRawList = Gson().fromJson(jsonOptionRaw, OptionRaw::class.java)
             } catch (e: Exception) {
                 Log.d("error parsing dynamic-attributes-and-options-raw", e.toString())
             }
 
-            val emptyOrNot3 = dataOperation.retrieveFieldsOption()
-            if (emptyOrNot3?.size == 0) {
+            val fieldsOption = retrieveFieldsOption()
+            if (fieldsOption?.size == 0) {
                 optionRawList?.result?.data?.fields?.let {
-                    dataOperation.insertFieldsOption(it)
+                    insertFieldsOption(
+                        fieldsOption = it
+                    )
                 }
             }
 
-            val emptyOrNot4 = dataOperation.retrieveOptions()
-            if (emptyOrNot4?.size == 0) {
+            val options = retrieveOptions()
+            if (options?.size == 0) {
                 optionRawList?.result?.data?.options?.let {
-                    dataOperation.insertOptions(it)
+                    insertOptions(
+                        options = it
+                    )
                 }
             }
             finishInsertion?.invoke()
         }
     }
+
+    //Category and SubCategory
+
+    private suspend fun insertCategories(itemCategories: RealmList<ItemCateg?>) {
+        val realm = Realm.getDefaultInstance()
+        realm.executeTransactionAwait(Dispatchers.IO) { realmTransaction ->
+            for(i in 0 until itemCategories.size){
+                val item = ItemCateg(itemCategories[i]?.has_child,itemCategories[i]?.icon,itemCategories[i]?.id,itemCategories[i]?.label,
+                    itemCategories[i]?.label_ar,itemCategories[i]?.label_en,itemCategories[i]?.name,itemCategories[i]?.order,itemCategories[i]?.parent_id,
+                    itemCategories[i]?.reporting_name,itemCategories[i]?.subCategories)
+                realmTransaction.insertOrUpdate(item)
+            }
+        }
+        realm.close()
+    }
+
+    fun retrieveCategories(): RealmResults<ItemCateg>? {
+        val realm = Realm.getDefaultInstance()
+        return realm.where(ItemCateg::class.java).sort("order").findAll()
+    }
+
+    fun retrieveSubCategories(parentID:Int?): RealmResults<SubCategory>? {
+        val realm = Realm.getDefaultInstance()
+        return realm.where(SubCategory::class.java).equalTo("parent_id",parentID).sort("order").findAll()
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    private suspend fun insertSearchFlows(searchFlows: RealmList<SearchFlow?>) {
+        val realm = Realm.getDefaultInstance()
+        realm.executeTransactionAwait(Dispatchers.IO) { realmTransaction ->
+            for(i in 0 until searchFlows.size){
+                val fullData = SearchFlow(searchFlows[i]?.category_id,searchFlows[i]?.order)
+                realmTransaction.insertOrUpdate(fullData)
+            }
+        }
+        realm.close()
+    }
+
+    private fun retrieveSearchFlows(): RealmResults<SearchFlow>? {
+        val realm = Realm.getDefaultInstance()
+        return realm.where(SearchFlow::class.java).findAll()
+    }
+
+    fun retrieveSearchFlow(categID:Int): SearchFlow? {
+        val realm = Realm.getDefaultInstance()
+        return realm.where(SearchFlow::class.java).equalTo("category_id",categID).findFirst()
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    private suspend fun insertFieldsLable(fieldsLabel: RealmList<FieldLabel?>) {
+        val realm = Realm.getDefaultInstance()
+        realm.executeTransactionAwait(Dispatchers.IO) { realmTransaction ->
+            for(i in 0 until fieldsLabel.size){
+                val fullData = FieldLabel(fieldsLabel[i]?.field_name,fieldsLabel[i]?.label_ar,fieldsLabel[i]?.label_en)
+                realmTransaction.insertOrUpdate(fullData)
+            }
+        }
+        realm.close()
+    }
+
+    private fun retrieveFieldsLable(): RealmResults<FieldLabel>? {
+        val realm = Realm.getDefaultInstance()
+        return realm.where(FieldLabel::class.java).findAll()
+    }
+
+    fun retrieveFieldLable(order:String): FieldLabel? {
+        val realm = Realm.getDefaultInstance()
+        return realm.where(FieldLabel::class.java).equalTo("field_name",order).findFirst()
+    }
+
+
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    private suspend fun insertFieldsOption(fieldsOption: RealmList<FieldOption?>) {
+        val realm = Realm.getDefaultInstance()
+        realm.executeTransactionAwait(Dispatchers.IO) { realmTransaction ->
+            for(i in 0 until fieldsOption.size){
+                val fullData = FieldOption(fieldsOption[i]?.id,fieldsOption[i]?.name,fieldsOption[i]?.data_type,fieldsOption[i]?.parent_id,fieldsOption[i]?.parent_name)
+                realmTransaction.insertOrUpdate(fullData)
+            }
+        }
+        realm.close()
+    }
+
+    private fun retrieveFieldsOption(): RealmResults<FieldOption>? {
+        val realm = Realm.getDefaultInstance()
+        return realm.where(FieldOption::class.java).findAll()
+    }
+
+    fun retrieveFieldsOption(id:Int): RealmResults<FieldOption>? {
+        val realm = Realm.getDefaultInstance()
+        return realm.where(FieldOption::class.java).
+        equalTo("parent_id",id).
+        findAll()
+    }
+
+    fun retrieveFieldOption(name:String, parentID: Int): FieldOption? {
+        val realm = Realm.getDefaultInstance()
+        return realm.where(FieldOption::class.java)
+            .equalTo("name",name)
+            .equalTo("parent_id",parentID)
+            .findFirst()
+    }
+
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////
+
+    private suspend fun insertOptions(options: RealmList<Option?>) {
+        val realm = Realm.getDefaultInstance()
+        realm.executeTransactionAwait(Dispatchers.IO) { realmTransaction ->
+            for(i in 0 until options.size){
+                val fullData = Option(options[i]?.id,options[i]?.field_id,options[i]?.label,options[i]?.label_en,options[i]?.value,options[i]?.option_img,options[i]?.has_child,options[i]?.parent_id,options[i]?.order)
+                realmTransaction.insertOrUpdate(fullData)
+            }
+        }
+    }
+
+    fun retrieveOptions(): RealmResults<Option>? {
+        val realm = Realm.getDefaultInstance()
+        return realm.where(Option::class.java).findAll()
+    }
+
+
+
+    fun retrieveOptions(field_id:String, parent_id: String?): RealmResults<Option>? {
+        val zero="0"
+        val realm = Realm.getDefaultInstance()
+        return realm.where(Option::class.java)
+            .equalTo("field_id",field_id)
+            .equalTo("parent_id",parent_id)
+            .or()
+            .equalTo("parent_id",zero)
+            .findAll()
+    }
+
+
+    fun updatingOptions(options: List<Option>): List<Option> {
+        val newOptions = ArrayList(options)
+        newOptions.add(
+            0, Option(
+                "-1",
+                "",
+                "Any",
+                "Any",
+                "Any",
+                R.drawable.ic_baseline_check_24.toString(),
+                "0",
+                "900099",
+                ""
+            )
+        )
+        return newOptions
+    }
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////
 
 
     private fun readFromAsset(activity: Activity, fileName: String): String {

@@ -4,10 +4,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.example.opensooqdemo.R
 import com.example.opensooqdemo.constants.Constants.IMAGE_BASE
 import com.example.opensooqdemo.exts.addRemove
+import com.example.opensooqdemo.exts.loadImage
 import com.example.opensooqdemo.option_raw.Option
 import kotlinx.android.synthetic.main.element_dialog_item_icon.view.*
 
@@ -49,13 +49,11 @@ class DialogIconAdapter(
 
             when (option.id) {
                 "-1" -> {
-                    Glide.with(itemView).load(option.option_img?.toInt())
-                        .into(itemView.imgDialogIcon)
+                    itemView.imgDialogIcon.loadImage(option.option_img?.toInt())
                 }
 
                 else -> {
-                    Glide.with(itemView).load(IMAGE_BASE + option.option_img)
-                        .into(itemView.imgDialogIcon)
+                    itemView.imgDialogIcon.loadImage(IMAGE_BASE + option.option_img)
                 }
             }
 

@@ -16,6 +16,7 @@ class StringAdapter(
 ) :
     RecyclerView.Adapter<StringAdapter.StringViewHolder>() {
 
+
     var onStringClick: (() -> Unit)? = null
 
 
@@ -39,9 +40,11 @@ class StringAdapter(
     inner class StringViewHolder(itemView: View, val selectedOptions: MutableSet<String>) :
         RecyclerView.ViewHolder(itemView) {
 
+
         @SuppressLint("SuspiciousIndentation")
         fun bind(option: Option) {
             itemView.txtCardString.text = option.label_en
+
 
             updateCell(option)
             itemView.CardString.setOnClickListener {
@@ -61,9 +64,8 @@ class StringAdapter(
 
             } else {
                 itemView.CardString.strokeWidth = 0
-                itemView.CardStringCheck.visibility = View.GONE
+                itemView.CardStringCheck.visibility = View.INVISIBLE
             }
         }
     }
 }
-

@@ -16,13 +16,14 @@ class DialogString(private val fieldOptionModel: FieldOptionModel) {
     @SuppressLint("NotifyDataSetChanged")
     fun showDialog(context: Context) {
         val dialog = Dialog(context)
-        dialog.setCancelable(false)
+        dialog.setCancelable(true)
         dialog.setContentView(R.layout.custom_dialog_icon_or_string)
-        dialog.ModelDialog.text = fieldOptionModel.LableEN
-        dialog.txtInputLayoutSearchDialogBox.hint = fieldOptionModel.LableEN
-        dialog.rvCustomDialog.layoutManager = LinearLayoutManager( dialog.rvCustomDialog.context)
+        dialog.ModelDialog.text = fieldOptionModel.fieldLableEn
+        dialog.txtInputLayoutSearchDialogBox.hint = fieldOptionModel.fieldLableEn
+        dialog.rvCustomDialog.layoutManager = LinearLayoutManager(dialog.rvCustomDialog.context)
         dialog.rvCustomDialog.setHasFixedSize(true)
-        val dialogStringAdapter = DialogStringAdapter(fieldOptionModel.options,fieldOptionModel.selectedOptions)
+        val dialogStringAdapter =
+            DialogStringAdapter(fieldOptionModel.options, fieldOptionModel.selectedOptions)
         dialog.rvCustomDialog.adapter = dialogStringAdapter
 
         dialog.CancelDialog.setOnClickListener {
