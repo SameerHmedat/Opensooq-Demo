@@ -10,6 +10,7 @@ import kotlinx.android.synthetic.main.custom_dialog_taps.*
 
 class NumericDialog(
     private val fieldOptionModel: FieldOptionModel,
+    val fieldWithSelectedOptions: HashMap<Int,ArrayList<String>>,
     context: Context
 ) {
     val dialog = Dialog(context)
@@ -19,7 +20,8 @@ class NumericDialog(
         dialog.setContentView(R.layout.custom_dialog_taps)
         val viewPagerAdapter = ViewPagerAdapter(
             fieldOptionModel = fieldOptionModel,
-            activity = activity
+            activity = activity,
+            fieldWithSelectedOptions = fieldWithSelectedOptions
         )
 
         dialog.viewPager2.adapter = viewPagerAdapter

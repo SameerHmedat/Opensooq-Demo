@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.opensooqdemo.FieldOptionModel
 import com.example.opensooqdemo.R
 import com.example.opensooqdemo.constants.Constants.IMAGE_BASE
 import com.example.opensooqdemo.exts.addRemove
@@ -13,9 +14,8 @@ import kotlinx.android.synthetic.main.element_item_icon.view.*
 
 
 class IconAdapter(
-
-    val options: List<Option>,
-    val selectedOptions: MutableSet<String> = mutableSetOf(),
+    val fieldOptionModel: FieldOptionModel,
+    val fieldWithSelectedOptions: HashMap<Int, ArrayList<String>>,
 ) :
     RecyclerView.Adapter<IconAdapter.StringIconViewHolder>() {
 
@@ -26,53 +26,67 @@ class IconAdapter(
         val itemView = LayoutInflater.from(parent.context).inflate(
             R.layout.element_item_icon, parent, false
         )
-        return StringIconViewHolder(itemView, selectedOptions)
+        return StringIconViewHolder(itemView)
     }
 
     override fun onBindViewHolder(holder: StringIconViewHolder, position: Int) {
-        val currentItem: Option = options[position]
+        val currentItem: Option = fieldOptionModel.options[position]
         holder.bind(currentItem)
     }
 
     override fun getItemCount(): Int {
-        return options.size
+        return fieldOptionModel.options.size
     }
 
-    inner class StringIconViewHolder(itemView: View, var selectedOptions: MutableSet<String>) :
+    inner class StringIconViewHolder(
+        itemView: View,
+    ) :
         RecyclerView.ViewHolder(itemView) {
 
         fun bind(option: Option) {
 
             when (option.id) {
                 "-1" -> {
-                    itemView.CardIconImage.visibility=View.INVISIBLE
-                    itemView.txtCardIcon.visibility=View.VISIBLE
+                    itemView.CardIconImage.visibility = View.INVISIBLE
+                    itemView.txtCardIcon.visibility = View.VISIBLE
                 }
 
                 else -> {
-                    itemView.CardIconImage.visibility=View.VISIBLE
-                    itemView.txtCardIcon.visibility=View.GONE
-                    itemView.CardIconImage.loadImage(IMAGE_BASE+option.option_img)
+                    itemView.CardIconImage.visibility = View.VISIBLE
+                    itemView.txtCardIcon.visibility = View.GONE
+                    itemView.CardIconImage.loadImage(IMAGE_BASE + option.option_img)
                 }
             }
             updateCell(option)
             itemView.CardIcon.setOnClickListener {
-                selectedOptions.addRemove(option.id.orEmpty())
+                if (!fieldWithSelectedOptions.contains(fieldOptionModel.fieldOption.id)) {
+                    fieldWithSelectedOptions[fieldOptionModel.fieldOption.id!!] =
+                        arrayListOf(option.id.orEmpty())
+                } else {
+                    val selectedOptions = fieldWithSelectedOptions[fieldOptionModel.fieldOption.id!!]
+                    selectedOptions?.addRemove(option.id.orEmpty())
+                    if (selectedOptions != null) {
+                        fieldWithSelectedOptions[fieldOptionModel.fieldOption.id!!] = selectedOptions
+                    }
+                }
                 onIconClick?.invoke()
                 updateCell(option)
             }
         }
 
         private fun updateCell(option: Option) {
-            itemView.CardIcon.isChecked = selectedOptions.contains(option.id)
-            if (itemView.CardIcon.isChecked) {
-                itemView.CardIcon.strokeWidth = 4
-                itemView.CardIcon.checkedIcon = null
-                itemView.CardIconCheck.visibility = View.VISIBLE
+            val selectedOptions = fieldWithSelectedOptions[fieldOptionModel.fieldOption.id!!]
+            if (selectedOptions != null) {
+                itemView.CardIcon.isChecked = selectedOptions.contains(option.id)
+                if (itemView.CardIcon.isChecked) {
+                    itemView.CardIcon.strokeWidth = 4
+                    itemView.CardIcon.checkedIcon = null
+                    itemView.CardIconCheck.visibility = View.VISIBLE
 
-            } else {
-                itemView.CardIcon.strokeWidth = 0
-                itemView.CardIconCheck.visibility = View.INVISIBLE
+                } else {
+                    itemView.CardIcon.strokeWidth = 0
+                    itemView.CardIconCheck.visibility = View.INVISIBLE
+                }
             }
         }
     }

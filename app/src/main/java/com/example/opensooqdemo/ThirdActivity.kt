@@ -8,6 +8,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.opensooqdemo.assign_raw.SearchFlow
+import com.example.opensooqdemo.constants.Constants.updatingOptions
 import com.example.opensooqdemo.option_raw.FieldOption
 import com.example.opensooqdemo.viewModel.MainViewModel
 import kotlinx.android.synthetic.main.activity_third.*
@@ -15,7 +16,11 @@ import kotlinx.android.synthetic.main.activity_third.*
 class ThirdActivity : AppCompatActivity() {
     private val viewModel: MainViewModel by lazy { ViewModelProvider(this)[MainViewModel::class.java] }
 
-    private val adapterList by lazy { LargeAdapter() }
+    private val adapterList by lazy {
+        LargeAdapter(viewModel.fieldWithSelectedOptions,
+            viewModel.backupValueFrom,
+            viewModel.backupValueTo)
+    }
     private var searchFlow: SearchFlow? = null
 
 
@@ -31,9 +36,9 @@ class ThirdActivity : AppCompatActivity() {
         }
 
         if (savedInstanceState == null) {
-            viewModel.backupItemsList.clear()
-            viewModel.backupValuesFrom.clear()
-            viewModel.backupValuesTo.clear()
+            viewModel.fieldWithSelectedOptions.clear()
+            viewModel.backupValueFrom.clear()
+            viewModel.backupValueTo.clear()
         }
 
 
@@ -54,54 +59,46 @@ class ThirdActivity : AppCompatActivity() {
             alertDialog.show()
 
         } else {
-
             val results = arrayListOf<FieldOptionModel>()
+            for (i in 0 until searchFlow?.order!!.size) {
 
-            if (viewModel.backupItemsList.size == 0) {
+                val fieldLableEn =
+                    viewModel.retrieveFieldLable(order = searchFlow?.order!![i].orEmpty())?.label_en
 
-                for (i in 0 until searchFlow?.order!!.size) {
+                val fieldOption = viewModel.retrieveFieldOption(
+                    name = searchFlow?.order!![i].orEmpty(), parentID = 0
+                )
 
-                    val fieldLableEn =
-                        viewModel.retrieveFieldLable(order = searchFlow?.order!![i].orEmpty())?.label_en
-
-                    val fieldOption = viewModel.retrieveFieldOption(
-                        name = searchFlow?.order!![i].orEmpty(), parentID = 0
-                    )
-
-                    val options = viewModel.retrieveOptions(
-                        field_id = fieldOption?.id.toString(), parent_id = null
-                    )?.filter {
-                        it.field_id == fieldOption?.id.toString()
-                    }
-
-                    fieldOption?.let {
-                        FieldOptionModel(
-                            fieldOption = it,
-                            options = viewModel.updatingOptions(options.orEmpty()),
-                            selectedOptions = mutableSetOf(),
-                            fieldLableEn = fieldLableEn.orEmpty()
-                        )
-                    }?.let {
-                        results.add(it)
-                    }
+                val options = viewModel.retrieveOptions(
+                    field_id = fieldOption?.id.toString(), parent_id = null
+                )?.filter {
+                    it.field_id == fieldOption?.id.toString()
                 }
 
-            } else {
-                results.addAll(viewModel.backupItemsList)
+                fieldOption?.let {
+                    FieldOptionModel(
+                        fieldOption = it,
+                        options = updatingOptions(options.orEmpty()),
+                        fieldLableEn = fieldLableEn.orEmpty()
+                    )
+                }?.let {
+                    results.add(it)
+                }
             }
+
+
             adapterList.itemsList = results
             recyclerViewFull.apply {
                 layoutManager = LinearLayoutManager(this@ThirdActivity)
                 adapter = adapterList
             }
             adapterList.onShowHiddenField = { fieldOptionModel ->
-                showHideHiddenField(fieldOptionModel = fieldOptionModel)
+                showHideHiddenField(fieldOptionModel = fieldOptionModel, viewModel.fieldWithSelectedOptions)
             }
-            adapterList.onBackupListener = {
-                viewModel.backupItemsList.clear()
-                viewModel.backupItemsList.addAll(elements = adapterList.itemsList)
-            }
+        }
 
+        for (i in 0 until adapterList.itemsList.size) {
+            showHideHiddenField(adapterList.itemsList[i], viewModel.fieldWithSelectedOptions)
         }
 
     }
@@ -115,7 +112,10 @@ class ThirdActivity : AppCompatActivity() {
 
 
     @SuppressLint("NotifyDataSetChanged")
-    private fun showHideHiddenField(fieldOptionModel: FieldOptionModel) {
+    private fun showHideHiddenField(
+        fieldOptionModel: FieldOptionModel,
+        fieldWithSelectedOptions: HashMap<Int, ArrayList<String>>,
+    ) {
         val parentFieldOptionID = fieldOptionModel.fieldOption.id.toString() //brand
 
         val childrenFieldOption =
@@ -125,12 +125,13 @@ class ThirdActivity : AppCompatActivity() {
             for (k in 0 until childrenFieldOption.size) {
 
                 removeElement(fieldOption = childrenFieldOption[k])
-                adapterList.notifyDataSetChanged()
 
-                if (fieldOptionModel.selectedOptions.size == 1) {
+                val selectedOptions = fieldWithSelectedOptions[fieldOptionModel.fieldOption.id]
+
+                if (selectedOptions?.size == 1) {
 
                     val optionID =
-                        fieldOptionModel.selectedOptions.first()  //because I am sure I have one Option selected for example KIA
+                        selectedOptions.first()  //because I am sure I have one Option selected for example KIA
 
                     if (optionID == "-1") {
                         break
@@ -150,7 +151,7 @@ class ThirdActivity : AppCompatActivity() {
                         option.parent_id == optionID
                     } //Asia,Avila,optima
 
-                    val updatedOptions = options?.let { viewModel.updatingOptions(options = it) }
+                    val updatedOptions = options?.let { updatingOptions(options = it) }
 
                     val fieldLable =
                         viewModel.retrieveFieldLable(order = childrenFieldOption[k]?.name.orEmpty())?.label_en
@@ -160,7 +161,6 @@ class ThirdActivity : AppCompatActivity() {
                         FieldOptionModel(
                             fieldOption = fieldOption,
                             options = updatedOptions.orEmpty(),
-                            selectedOptions = mutableSetOf(),
                             fieldLableEn = fieldLable.orEmpty()
                         )
                     }?.let { newFieldOptionModel ->
@@ -168,7 +168,7 @@ class ThirdActivity : AppCompatActivity() {
                             index = position,
                             element = newFieldOptionModel
                         )
-                        adapterList.notifyDataSetChanged()
+                        adapterList.notifyItemInserted(position)
                     }
                 }
             }
@@ -180,10 +180,11 @@ class ThirdActivity : AppCompatActivity() {
         for (t in 0 until adapterList.itemsList.size) {
             if (fieldOption?.id == adapterList.itemsList[t].fieldOption.id) {
                 adapterList.itemsList.remove(element = adapterList.itemsList[t])
+                viewModel.fieldWithSelectedOptions.remove(fieldOption?.id)
+                adapterList.notifyItemRemoved(t)
                 break
             }
         }
     }
-
 
 }

@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.opensooqdemo.FieldOptionModel
 import com.example.opensooqdemo.R
 import com.example.opensooqdemo.exts.addRemove
 import com.example.opensooqdemo.option_raw.Option
@@ -13,32 +14,31 @@ import kotlinx.android.synthetic.main.element_item_boolean.view.*
 
 
 class BooleanAdapter(
-    val options: List<Option>,
-    val selectedOptions: MutableSet<String> = mutableSetOf()
+    val fieldOptionModel: FieldOptionModel,
+    val fieldWithSelectedOptions: HashMap<Int, ArrayList<String>>
 ) :
     RecyclerView.Adapter<BooleanAdapter.StringBooleanViewHolder>() {
 
-    var onBooleanClick: (() -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StringBooleanViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(
             R.layout.element_item_boolean, parent, false
         )
 
-        return StringBooleanViewHolder(itemView, selectedOptions)
+        return StringBooleanViewHolder(itemView)
     }
 
     override fun onBindViewHolder(holder: StringBooleanViewHolder, position: Int) {
-        val currentItem: Option = options[position]
+        val currentItem: Option = fieldOptionModel.options[position]
         holder.bind(currentItem)
 
     }
 
     override fun getItemCount(): Int {
-        return options.size
+        return fieldOptionModel.options.size
     }
 
-    inner class StringBooleanViewHolder(itemView: View, var selectedOptions: MutableSet<String>) :
+    inner class StringBooleanViewHolder(itemView: View) :
         RecyclerView.ViewHolder(itemView) {
 
         init {
@@ -56,13 +56,23 @@ class BooleanAdapter(
             updateCell(option)
 
             itemView.txtBoolean.setOnClickListener {
-                selectedOptions.addRemove(option.id.orEmpty())
-                onBooleanClick?.invoke()
+                if(!fieldWithSelectedOptions.contains(fieldOptionModel.fieldOption.id)){
+                    fieldWithSelectedOptions[fieldOptionModel.fieldOption.id!!] = arrayListOf(option.id.orEmpty())
+                }
+                else{
+                    val selectedOptions=fieldWithSelectedOptions[fieldOptionModel.fieldOption.id!!]
+                    selectedOptions?.addRemove(option.id.orEmpty())
+                    if (selectedOptions != null) {
+                        fieldWithSelectedOptions[fieldOptionModel.fieldOption.id!!] = selectedOptions
+                    }
+                }
                 updateCell(option)
             }
         }
 
         private fun updateCell(option: Option) {
+            val selectedOptions=fieldWithSelectedOptions[fieldOptionModel.fieldOption.id!!]
+            if(selectedOptions != null){
             if (selectedOptions.contains(option.id)) {
                 itemView.txtBoolean.setBackgroundResource(R.drawable.textboolean_background_sky)
                 itemView.txtBoolean.setTextColor(Color.parseColor("#FFFFFF"))
@@ -71,6 +81,7 @@ class BooleanAdapter(
                 itemView.txtBoolean.setTextColor(Color.parseColor("#808080"))
             }
         }
+      }
     }
 }
 

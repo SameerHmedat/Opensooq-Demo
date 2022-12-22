@@ -5,8 +5,6 @@ import android.app.Activity
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.opensooqdemo.FieldOptionModel
-import com.example.opensooqdemo.R
 import com.example.opensooqdemo.assign_raw.AssignRaw
 import com.example.opensooqdemo.assign_raw.FieldLabel
 import com.example.opensooqdemo.assign_raw.SearchFlow
@@ -29,9 +27,10 @@ import java.nio.charset.Charset
 
 class MainViewModel : ViewModel() {
 
-    val backupItemsList=arrayListOf<FieldOptionModel>()
-    val backupValuesFrom:HashMap<Int,String> = HashMap()
-    val backupValuesTo:HashMap<Int,String> = HashMap()
+    val fieldWithSelectedOptions: HashMap<Int, ArrayList<String>> = HashMap()
+
+    val backupValueFrom: HashMap<Int, String> = HashMap()
+    val backupValueTo: HashMap<Int, String> = HashMap()
 
     private var categoriesAndSubList: CategoriesAndSub? = null
     private var assignRawList: AssignRaw? = null
@@ -45,7 +44,8 @@ class MainViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             val jsonCategoriesAndSub = readFromAsset(activity, "categoriesAndsubCategories.json")
             try {
-                categoriesAndSubList = Gson().fromJson(jsonCategoriesAndSub, CategoriesAndSub::class.java)
+                categoriesAndSubList =
+                    Gson().fromJson(jsonCategoriesAndSub, CategoriesAndSub::class.java)
             } catch (e: Exception) {
                 Log.e("error parsing categoriesAndsubCategories", e.toString())
             }
@@ -117,10 +117,18 @@ class MainViewModel : ViewModel() {
     private suspend fun insertCategories(itemCategories: RealmList<ItemCateg?>) {
         val realm = Realm.getDefaultInstance()
         realm.executeTransactionAwait(Dispatchers.IO) { realmTransaction ->
-            for(i in 0 until itemCategories.size){
-                val item = ItemCateg(itemCategories[i]?.has_child,itemCategories[i]?.icon,itemCategories[i]?.id,itemCategories[i]?.label,
-                    itemCategories[i]?.label_ar,itemCategories[i]?.label_en,itemCategories[i]?.name,itemCategories[i]?.order,itemCategories[i]?.parent_id,
-                    itemCategories[i]?.reporting_name,itemCategories[i]?.subCategories)
+            for (i in 0 until itemCategories.size) {
+                val item = ItemCateg(itemCategories[i]?.has_child,
+                    itemCategories[i]?.icon,
+                    itemCategories[i]?.id,
+                    itemCategories[i]?.label,
+                    itemCategories[i]?.label_ar,
+                    itemCategories[i]?.label_en,
+                    itemCategories[i]?.name,
+                    itemCategories[i]?.order,
+                    itemCategories[i]?.parent_id,
+                    itemCategories[i]?.reporting_name,
+                    itemCategories[i]?.subCategories)
                 realmTransaction.insertOrUpdate(item)
             }
         }
@@ -132,9 +140,10 @@ class MainViewModel : ViewModel() {
         return realm.where(ItemCateg::class.java).sort("order").findAll()
     }
 
-    fun retrieveSubCategories(parentID:Int?): RealmResults<SubCategory>? {
+    fun retrieveSubCategories(parentID: Int?): RealmResults<SubCategory>? {
         val realm = Realm.getDefaultInstance()
-        return realm.where(SubCategory::class.java).equalTo("parent_id",parentID).sort("order").findAll()
+        return realm.where(SubCategory::class.java).equalTo("parent_id", parentID).sort("order")
+            .findAll()
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -142,8 +151,8 @@ class MainViewModel : ViewModel() {
     private suspend fun insertSearchFlows(searchFlows: RealmList<SearchFlow?>) {
         val realm = Realm.getDefaultInstance()
         realm.executeTransactionAwait(Dispatchers.IO) { realmTransaction ->
-            for(i in 0 until searchFlows.size){
-                val fullData = SearchFlow(searchFlows[i]?.category_id,searchFlows[i]?.order)
+            for (i in 0 until searchFlows.size) {
+                val fullData = SearchFlow(searchFlows[i]?.category_id, searchFlows[i]?.order)
                 realmTransaction.insertOrUpdate(fullData)
             }
         }
@@ -155,9 +164,9 @@ class MainViewModel : ViewModel() {
         return realm.where(SearchFlow::class.java).findAll()
     }
 
-    fun retrieveSearchFlow(categID:Int): SearchFlow? {
+    fun retrieveSearchFlow(categID: Int): SearchFlow? {
         val realm = Realm.getDefaultInstance()
-        return realm.where(SearchFlow::class.java).equalTo("category_id",categID).findFirst()
+        return realm.where(SearchFlow::class.java).equalTo("category_id", categID).findFirst()
     }
 
 
@@ -167,8 +176,10 @@ class MainViewModel : ViewModel() {
     private suspend fun insertFieldsLable(fieldsLabel: RealmList<FieldLabel?>) {
         val realm = Realm.getDefaultInstance()
         realm.executeTransactionAwait(Dispatchers.IO) { realmTransaction ->
-            for(i in 0 until fieldsLabel.size){
-                val fullData = FieldLabel(fieldsLabel[i]?.field_name,fieldsLabel[i]?.label_ar,fieldsLabel[i]?.label_en)
+            for (i in 0 until fieldsLabel.size) {
+                val fullData = FieldLabel(fieldsLabel[i]?.field_name,
+                    fieldsLabel[i]?.label_ar,
+                    fieldsLabel[i]?.label_en)
                 realmTransaction.insertOrUpdate(fullData)
             }
         }
@@ -180,12 +191,10 @@ class MainViewModel : ViewModel() {
         return realm.where(FieldLabel::class.java).findAll()
     }
 
-    fun retrieveFieldLable(order:String): FieldLabel? {
+    fun retrieveFieldLable(order: String): FieldLabel? {
         val realm = Realm.getDefaultInstance()
-        return realm.where(FieldLabel::class.java).equalTo("field_name",order).findFirst()
+        return realm.where(FieldLabel::class.java).equalTo("field_name", order).findFirst()
     }
-
-
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -194,8 +203,12 @@ class MainViewModel : ViewModel() {
     private suspend fun insertFieldsOption(fieldsOption: RealmList<FieldOption?>) {
         val realm = Realm.getDefaultInstance()
         realm.executeTransactionAwait(Dispatchers.IO) { realmTransaction ->
-            for(i in 0 until fieldsOption.size){
-                val fullData = FieldOption(fieldsOption[i]?.id,fieldsOption[i]?.name,fieldsOption[i]?.data_type,fieldsOption[i]?.parent_id,fieldsOption[i]?.parent_name)
+            for (i in 0 until fieldsOption.size) {
+                val fullData = FieldOption(fieldsOption[i]?.id,
+                    fieldsOption[i]?.name,
+                    fieldsOption[i]?.data_type,
+                    fieldsOption[i]?.parent_id,
+                    fieldsOption[i]?.parent_name)
                 realmTransaction.insertOrUpdate(fullData)
             }
         }
@@ -207,21 +220,18 @@ class MainViewModel : ViewModel() {
         return realm.where(FieldOption::class.java).findAll()
     }
 
-    fun retrieveFieldsOption(id:Int): RealmResults<FieldOption>? {
+    fun retrieveFieldsOption(id: Int): RealmResults<FieldOption>? {
         val realm = Realm.getDefaultInstance()
-        return realm.where(FieldOption::class.java).
-        equalTo("parent_id",id).
-        findAll()
+        return realm.where(FieldOption::class.java).equalTo("parent_id", id).findAll()
     }
 
-    fun retrieveFieldOption(name:String, parentID: Int): FieldOption? {
+    fun retrieveFieldOption(name: String, parentID: Int): FieldOption? {
         val realm = Realm.getDefaultInstance()
         return realm.where(FieldOption::class.java)
-            .equalTo("name",name)
-            .equalTo("parent_id",parentID)
+            .equalTo("name", name)
+            .equalTo("parent_id", parentID)
             .findFirst()
     }
-
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////
@@ -229,8 +239,16 @@ class MainViewModel : ViewModel() {
     private suspend fun insertOptions(options: RealmList<Option?>) {
         val realm = Realm.getDefaultInstance()
         realm.executeTransactionAwait(Dispatchers.IO) { realmTransaction ->
-            for(i in 0 until options.size){
-                val fullData = Option(options[i]?.id,options[i]?.field_id,options[i]?.label,options[i]?.label_en,options[i]?.value,options[i]?.option_img,options[i]?.has_child,options[i]?.parent_id,options[i]?.order)
+            for (i in 0 until options.size) {
+                val fullData = Option(options[i]?.id,
+                    options[i]?.field_id,
+                    options[i]?.label,
+                    options[i]?.label_en,
+                    options[i]?.value,
+                    options[i]?.option_img,
+                    options[i]?.has_child,
+                    options[i]?.parent_id,
+                    options[i]?.order)
                 realmTransaction.insertOrUpdate(fullData)
             }
         }
@@ -242,35 +260,15 @@ class MainViewModel : ViewModel() {
     }
 
 
-
-    fun retrieveOptions(field_id:String, parent_id: String?): RealmResults<Option>? {
-        val zero="0"
+    fun retrieveOptions(field_id: String, parent_id: String?): RealmResults<Option>? {
+        val zero = "0"
         val realm = Realm.getDefaultInstance()
         return realm.where(Option::class.java)
-            .equalTo("field_id",field_id)
-            .equalTo("parent_id",parent_id)
+            .equalTo("field_id", field_id)
+            .equalTo("parent_id", parent_id)
             .or()
-            .equalTo("parent_id",zero)
+            .equalTo("parent_id", zero)
             .findAll()
-    }
-
-
-    fun updatingOptions(options: List<Option>): List<Option> {
-        val newOptions = ArrayList(options)
-        newOptions.add(
-            0, Option(
-                "-1",
-                "",
-                "Any",
-                "Any",
-                "Any",
-                R.drawable.ic_baseline_check_24.toString(),
-                "0",
-                "900099",
-                ""
-            )
-        )
-        return newOptions
     }
 
 

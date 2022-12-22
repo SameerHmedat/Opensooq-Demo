@@ -4,13 +4,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.opensooqdemo.FieldOptionModel
 import com.example.opensooqdemo.R
+import com.example.opensooqdemo.exts.addRemove
 import com.example.opensooqdemo.option_raw.Option
 import kotlinx.android.synthetic.main.element_dialog_numeric.view.*
 
 class NumericAdapter(
-    val options: List<Option>,
-    val selectedOptions: MutableSet<String> = mutableSetOf()
+    val fieldOptionModel: FieldOptionModel,
+    val fieldWithSelectedOptions: HashMap<Int, ArrayList<String>>
 ) :
     RecyclerView.Adapter<NumericAdapter.NumericViewHolder>() {
 
@@ -20,21 +22,20 @@ class NumericAdapter(
         val itemView = LayoutInflater.from(parent.context).inflate(
             R.layout.element_dialog_numeric, parent, false
         )
-        return NumericViewHolder(itemView, selectedOptions)
+        return NumericViewHolder(itemView)
     }
 
     override fun onBindViewHolder(holder: NumericViewHolder, position: Int) {
-        val currentItem: Option = options[position]
+        val currentItem: Option = fieldOptionModel.options[position]
         holder.bind(currentItem)
     }
 
     override fun getItemCount(): Int {
-        return options.size
+        return fieldOptionModel.options.size
     }
 
     inner class NumericViewHolder(
-        itemView: View,
-        val selectedOptions: MutableSet<String>,
+        itemView: View
     ) :
         RecyclerView.ViewHolder(itemView) {
 
@@ -42,9 +43,15 @@ class NumericAdapter(
         fun bind(option: Option) {
             itemView.txtTapValue.text = option.value
             itemView.numericLayout.setOnClickListener {
-                selectedOptions.clear()
-                selectedOptions.add(options[adapterPosition].value.orEmpty())
+
+                if(!fieldWithSelectedOptions.contains(fieldOptionModel.fieldOption.id)){
+                    fieldWithSelectedOptions[fieldOptionModel.fieldOption.id!!] = arrayListOf(option.id.orEmpty())
+                }
+                else{
+                    fieldWithSelectedOptions[fieldOptionModel.fieldOption.id!!] = arrayListOf(option.id.orEmpty())
+                }
                 onNumericItemClick?.invoke()
+
             }
         }
     }

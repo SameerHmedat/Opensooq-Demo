@@ -9,6 +9,7 @@ import com.example.opensooqdemo.constants.Constants.instanceCustomFragment
 
 class ViewPagerAdapter(
     private val fieldOptionModel: FieldOptionModel,
+    val fieldWithSelectedOptions: HashMap<Int,ArrayList<String>>,
     activity: ThirdActivity,
 ) :
     FragmentStateAdapter(activity.supportFragmentManager, activity.lifecycle) {
@@ -25,7 +26,7 @@ class ViewPagerAdapter(
 
         when (position) {
             0 -> {
-                val customFragment = instanceCustomFragment(fieldOptionModel)
+                val customFragment = instanceCustomFragment(fieldOptionModel = fieldOptionModel, fieldWithSelectedOptions = fieldWithSelectedOptions)
                 customFragment.fragmentListener = {
                     viewPagerListener?.invoke(position)
                 }
@@ -33,7 +34,7 @@ class ViewPagerAdapter(
             }
 
             1 -> {
-                val customFragment = instanceCustomFragment(fieldOptionModel)
+                val customFragment = instanceCustomFragment(fieldOptionModel = fieldOptionModel, fieldWithSelectedOptions=fieldWithSelectedOptions)
                 customFragment.fragmentListener = {
                     viewPagerListener?.invoke(position)
                 }

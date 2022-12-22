@@ -9,15 +9,12 @@ import com.example.opensooqdemo.option_raw.Option
 class FieldOptionModel(
     val fieldOption: FieldOption,
     var options: List<Option>,
-    var selectedOptions: MutableSet<String>,
     var fieldLableEn: String
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
         TODO("fieldOption"),
         TODO("options"),
-        TODO("selectedOptions"),
-        parcel.readString()!!
-    ) {
+        parcel.readString().toString()) {
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
@@ -37,6 +34,4 @@ class FieldOptionModel(
             return arrayOfNulls(size)
         }
     }
-
-
 }

@@ -3,13 +3,13 @@ package com.example.opensooqdemo
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.opensooqdemo.constants.Constants.TYPE_LIST_BOOLEAN
 import com.example.opensooqdemo.constants.Constants.TYPE_LIST_NUMERIC
 import com.example.opensooqdemo.constants.Constants.TYPE_LIST_STRING
 import com.example.opensooqdemo.constants.Constants.TYPE_LIST_STRING_OF_ICON
+import com.example.opensooqdemo.constants.Constants.updatingOptions
 import com.example.opensooqdemo.databinding.*
 import com.example.opensooqdemo.list_of_boolean.BooleanAdapter
 import com.example.opensooqdemo.list_of_numeric.NumericDialog
@@ -18,17 +18,21 @@ import com.example.opensooqdemo.list_of_string.StringAdapter
 import com.example.opensooqdemo.list_icon.DialogIcon
 import com.example.opensooqdemo.list_icon.IconAdapter
 import com.example.opensooqdemo.option_raw.Option
-import com.example.opensooqdemo.viewModel.MainViewModel
 import com.google.android.flexbox.*
+import io.realm.Realm
+import io.realm.RealmResults
 import kotlinx.android.synthetic.main.custom_dialog_taps.*
 
 
-class LargeAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class LargeAdapter(
+    val fieldWithSelectedOptions: HashMap<Int, ArrayList<String>>,
+    val backupValuesFrom: HashMap<Int, String>,
+    val backupValuesTo: HashMap<Int, String>,
+
+    ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
 
     var onShowHiddenField: ((FieldOptionModel) -> Unit)? = null
-
-    var onBackupListener: (() -> Unit)? = null
 
 
     inner class ListOfStringViewHolder(val itemBinding: ListStringBinding) :
@@ -50,35 +54,39 @@ class LargeAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
             val stringAdapter =
                 StringAdapter(
-                    options = fieldOptionModel.options,
-                    selectedOptions = fieldOptionModel.selectedOptions
+                    fieldOptionModel = fieldOptionModel, fieldWithSelectedOptions = fieldWithSelectedOptions
                 )
 
             itemBinding.rvListOfString.adapter = stringAdapter
             updateSelectedOptions(fieldOptionModel = fieldOptionModel)
             stringAdapter.onStringClick = {
                 updateSelectedOptions(fieldOptionModel = fieldOptionModel)
-                onBackupListener?.invoke()
             }
 
             itemBinding.openDialogString.setOnClickListener {
                 val dialog = DialogString(
-                    fieldOptionModel = fieldOptionModel
+                    fieldOptionModel = fieldOptionModel,
+                    fieldWithSelectedOptions = fieldWithSelectedOptions
                 )
                 dialog.showDialog(context = itemBinding.rvListOfString.context)
                 dialog.onDialogStringClick = {
                     updateSelectedOptions(fieldOptionModel = fieldOptionModel)
                     stringAdapter.notifyDataSetChanged()
-                    onBackupListener?.invoke()
                 }
             }
         }
 
         private fun updateSelectedOptions(fieldOptionModel: FieldOptionModel) {
-            val text = fieldOptionModel.options.filter {
-                fieldOptionModel.selectedOptions.contains(it.id)
-            }.map { it.label_en }.joinToString()
-            itemBinding.subTitleString.text = text
+            itemBinding.subTitleString.text = ""
+            if (fieldWithSelectedOptions.contains(fieldOptionModel.fieldOption.id)) {
+                val selectedOptions = fieldWithSelectedOptions[fieldOptionModel.fieldOption.id]
+                if (selectedOptions?.isNotEmpty() == true) {
+                    val text = fieldOptionModel.options.filter {
+                        selectedOptions.contains(it.id)
+                    }.map { it.label_en }.joinToString()
+                    itemBinding.subTitleString.text = text
+                }
+            }
         }
     }
 
@@ -98,15 +106,15 @@ class LargeAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         @SuppressLint("NotifyDataSetChanged")
         fun bind(
-            fieldOptionModel: FieldOptionModel
+            fieldOptionModel: FieldOptionModel,
         ) {
             itemBinding.titleIcon.text = fieldOptionModel.fieldLableEn
 
 
             val iconAdapter =
                 IconAdapter(
-                    options = fieldOptionModel.options,
-                    selectedOptions = fieldOptionModel.selectedOptions
+                    fieldOptionModel = fieldOptionModel,
+                    fieldWithSelectedOptions = fieldWithSelectedOptions
                 )
 
 
@@ -119,66 +127,80 @@ class LargeAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 updateSelectedOptions(fieldOptionModel = fieldOptionModel)
                 onShowHiddenField?.invoke(fieldOptionModel)
                 iconAdapter.notifyDataSetChanged()
-                onBackupListener?.invoke()
             }
 
             itemBinding.openDialogIcon.setOnClickListener {
                 val dialog = DialogIcon(
-                    fieldOptionModel = fieldOptionModel
+                    fieldOptionModel = fieldOptionModel,
+                    fieldWithSelectedOptions = fieldWithSelectedOptions
                 )
                 dialog.showDialog(context = itemBinding.rvListOfIconOFString.context)
                 dialog.onDialogIconClick = {
                     updateSelectedOptions(fieldOptionModel = fieldOptionModel)
                     onShowHiddenField?.invoke(fieldOptionModel)
                     iconAdapter.notifyDataSetChanged()
-                    onBackupListener?.invoke()
                 }
             }
         }
 
         private fun updateSelectedOptions(fieldOptionModel: FieldOptionModel) {
-            val text = fieldOptionModel.options.filter {
-                fieldOptionModel.selectedOptions.contains(it.id)
-            }.map { it.label_en }.joinToString()
-            itemBinding.subTitleIcon.text = text
+            itemBinding.subTitleIcon.text = ""
+            if (fieldWithSelectedOptions.contains(fieldOptionModel.fieldOption.id)) {
+                val selectedOptions = fieldWithSelectedOptions[fieldOptionModel.fieldOption.id]
+                if (selectedOptions?.isNotEmpty() == true) {
+                    val text = fieldOptionModel.options.filter {
+                        selectedOptions.contains(it.id)
+                    }.map { it.label_en }.joinToString()
+                    itemBinding.subTitleIcon.text = text
+                }
+            }
         }
 
     }
 
     inner class ListOfNumericViewHolder(val itemBinding: ListNumericBinding) :
         RecyclerView.ViewHolder(itemBinding.root) {
-        private val viewModel: MainViewModel by lazy { ViewModelProvider(itemBinding.numericToValue.context as ThirdActivity)[MainViewModel::class.java] }
 
 
         fun bind(fieldOptionModel: FieldOptionModel) {
 
             itemBinding.numericTitle.text = fieldOptionModel.fieldLableEn
 
-            if (viewModel.backupValuesFrom.isNotEmpty()) {
-                itemBinding.numericFromValue.text = viewModel.backupValuesFrom[fieldOptionModel.fieldOption.id]
+            if (backupValuesFrom.isNotEmpty()) {
+                itemBinding.numericFromValue.text =
+                    backupValuesFrom[fieldOptionModel.fieldOption.id]
             }
 
-            if (viewModel.backupValuesTo.isNotEmpty()) {
-                itemBinding.numericToValue.text = viewModel.backupValuesTo[fieldOptionModel.fieldOption.id]
+            if (backupValuesTo.isNotEmpty()) {
+                itemBinding.numericToValue.text = backupValuesTo[fieldOptionModel.fieldOption.id]
             }
 
             val dialog = NumericDialog(
                 fieldOptionModel = fieldOptionModel,
+                fieldWithSelectedOptions = fieldWithSelectedOptions,
                 context = itemBinding.numericFromValue.context
             )
             dialog.dialogNumericListener = { pos: Int ->
 
-                when (pos) {
+                var value = ""
+                for (i in 0 until fieldOptionModel.options.size) {
+                    if (fieldWithSelectedOptions[fieldOptionModel.fieldOption.id!!]?.first()
+                            .orEmpty() == fieldOptionModel.options[i].id
+                    ) {
+                        value = fieldOptionModel.options[i].value.orEmpty()
+                    }
+                }
 
+                when (pos) {
                     0 -> {
-                        viewModel.backupValuesFrom[fieldOptionModel.fieldOption.id!!] = fieldOptionModel.selectedOptions.last()
-                        itemBinding.numericFromValue.text = fieldOptionModel.selectedOptions.last()
-                        itemBinding.numericToValue.text=""
-                        viewModel.backupValuesTo[fieldOptionModel.fieldOption.id!!]=""
+                        backupValuesFrom[fieldOptionModel.fieldOption.id!!] = value
+                        itemBinding.numericFromValue.text = value
+                        itemBinding.numericToValue.text = ""
+                        backupValuesTo[fieldOptionModel.fieldOption.id!!] = ""
                     }
                     1 -> {
-                        viewModel.backupValuesTo[fieldOptionModel.fieldOption.id!!] = fieldOptionModel.selectedOptions.last()
-                        itemBinding.numericToValue.text = fieldOptionModel.selectedOptions.last()
+                        backupValuesTo[fieldOptionModel.fieldOption.id!!] = value
+                        itemBinding.numericToValue.text = value
                     }
                 }
             }
@@ -186,24 +208,37 @@ class LargeAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             itemBinding.numericFromLayout.setOnClickListener {
 
                 val fieldOptionID = fieldOptionModel.fieldOption.id.toString()
-                fieldOptionModel.options = viewModel.updatingOptions(viewModel.retrieveOptions(
+
+                fieldOptionModel.options = updatingOptions(retrieveOptions(
                     field_id = fieldOptionID, parent_id = null
                 )?.filter {
                     it.field_id == fieldOptionID
-                } as List<Option> )
+                } as List<Option>)
 
                 dialog.showNumericDialog(activity = itemBinding.numericFromValue.context as ThirdActivity)
             }
 
             itemBinding.numericToLayout.setOnClickListener {
 
-                if (viewModel.backupValuesFrom.isNotEmpty()) {
-                (fieldOptionModel.options as ArrayList).removeAll {
-                    it.value!! <  viewModel.backupValuesFrom[fieldOptionModel.fieldOption.id!!].orEmpty()
-                }}
+                if (backupValuesFrom.isNotEmpty()) {
+                    (fieldOptionModel.options as ArrayList).removeAll {
+                        it.value!! < backupValuesFrom[fieldOptionModel.fieldOption.id!!].orEmpty()
+                    }
+                }
                 dialog.showNumericDialog(activity = itemBinding.numericToValue.context as ThirdActivity)
                 dialog.dialog.tab_layout.getTabAt(1)?.select() //to move to next tap
             }
+        }
+
+        private fun retrieveOptions(field_id: String, parent_id: String?): RealmResults<Option>? {
+            val zero = "0"
+            val realm = Realm.getDefaultInstance()
+            return realm.where(Option::class.java)
+                .equalTo("field_id", field_id)
+                .equalTo("parent_id", parent_id)
+                .or()
+                .equalTo("parent_id", zero)
+                .findAll()
         }
     }
 
@@ -222,14 +257,11 @@ class LargeAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             itemBinding.titleBoolean.text = fieldOptionModel.fieldLableEn
 
             val booleanAdapter = BooleanAdapter(
-                options = fieldOptionModel.options,
-                selectedOptions = fieldOptionModel.selectedOptions
+                fieldOptionModel = fieldOptionModel,
+                fieldWithSelectedOptions = fieldWithSelectedOptions
             )
             itemBinding.rvListOfBoolean.adapter = booleanAdapter
 
-            booleanAdapter.onBooleanClick = {
-                onBackupListener?.invoke()
-            }
         }
     }
 
