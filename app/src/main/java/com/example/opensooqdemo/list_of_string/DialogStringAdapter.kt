@@ -9,11 +9,10 @@ import com.example.opensooqdemo.R
 import com.example.opensooqdemo.exts.addRemove
 import com.example.opensooqdemo.option_raw.Option
 import kotlinx.android.synthetic.main.element_dialog_item_string.view.*
-import kotlinx.android.synthetic.main.element_item_string.view.*
 
 class DialogStringAdapter(
     val fieldOptionModel: FieldOptionModel,
-    val fieldWithSelectedOptions: HashMap<Int, ArrayList<String>>,
+    val fieldsOptionWithSelected: HashMap<Int, ArrayList<String>>,
 ) :
     RecyclerView.Adapter<DialogStringAdapter.CustomDialogStringViewHolder>() {
 
@@ -25,7 +24,7 @@ class DialogStringAdapter(
         val itemView = LayoutInflater.from(parent.context).inflate(
             R.layout.element_dialog_item_string, parent, false
         )
-        return CustomDialogStringViewHolder(itemView, fieldWithSelectedOptions, fieldOptionModel)
+        return CustomDialogStringViewHolder(itemView, fieldsOptionWithSelected, fieldOptionModel)
     }
 
 
@@ -40,7 +39,7 @@ class DialogStringAdapter(
 
     class CustomDialogStringViewHolder(
         itemView: View,
-        private val fieldWithSelectedOptions: HashMap<Int, ArrayList<String>>,
+        private val fieldsOptionWithSelected: HashMap<Int, ArrayList<String>>,
         private val fieldOptionModel: FieldOptionModel,
     ) :
         RecyclerView.ViewHolder(itemView) {
@@ -49,21 +48,21 @@ class DialogStringAdapter(
 
             itemView.txtDialogString.text = option.label_en
 
-            val selectedOptions = fieldWithSelectedOptions[fieldOptionModel.fieldOption.id!!]
+            val selectedOptions = fieldsOptionWithSelected[fieldOptionModel.fieldOption.id]
             if (selectedOptions != null) {
                 itemView.checkBoxDialogString.isChecked =
-                    selectedOptions.contains(option.id.orEmpty())
+                    selectedOptions.contains(option.id)
             }
 
             itemView.checkBoxDialogString.setOnClickListener {
-                if (!fieldWithSelectedOptions.contains(fieldOptionModel.fieldOption.id)) {
-                    fieldWithSelectedOptions[fieldOptionModel.fieldOption.id!!] =
-                        arrayListOf(option.id.orEmpty())
+                if (!fieldsOptionWithSelected.contains(fieldOptionModel.fieldOption.id)) {
+                    fieldsOptionWithSelected[fieldOptionModel.fieldOption.id] =
+                        arrayListOf(option.id)
                 } else {
-                    val selectedOptionS = fieldWithSelectedOptions[fieldOptionModel.fieldOption.id!!]
-                    selectedOptionS?.addRemove(option.id.orEmpty())
+                    val selectedOptionS = fieldsOptionWithSelected[fieldOptionModel.fieldOption.id]
+                    selectedOptionS?.addRemove(option.id)
                     if (selectedOptionS != null) {
-                        fieldWithSelectedOptions[fieldOptionModel.fieldOption.id!!] = selectedOptionS
+                        fieldsOptionWithSelected[fieldOptionModel.fieldOption.id] = selectedOptionS
                     }
                 }
             }

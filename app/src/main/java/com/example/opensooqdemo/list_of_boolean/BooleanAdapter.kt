@@ -15,7 +15,7 @@ import kotlinx.android.synthetic.main.element_item_boolean.view.*
 
 class BooleanAdapter(
     val fieldOptionModel: FieldOptionModel,
-    val fieldWithSelectedOptions: HashMap<Int, ArrayList<String>>
+    val fieldsOptionWithSelected: HashMap<Int, ArrayList<String>>
 ) :
     RecyclerView.Adapter<BooleanAdapter.StringBooleanViewHolder>() {
 
@@ -56,14 +56,14 @@ class BooleanAdapter(
             updateCell(option)
 
             itemView.txtBoolean.setOnClickListener {
-                if(!fieldWithSelectedOptions.contains(fieldOptionModel.fieldOption.id)){
-                    fieldWithSelectedOptions[fieldOptionModel.fieldOption.id!!] = arrayListOf(option.id.orEmpty())
+                if(!fieldsOptionWithSelected.contains(fieldOptionModel.fieldOption.id)){
+                    fieldsOptionWithSelected[fieldOptionModel.fieldOption.id] = arrayListOf(option.id)
                 }
                 else{
-                    val selectedOptions=fieldWithSelectedOptions[fieldOptionModel.fieldOption.id!!]
-                    selectedOptions?.addRemove(option.id.orEmpty())
+                    val selectedOptions=fieldsOptionWithSelected[fieldOptionModel.fieldOption.id]
+                    selectedOptions?.addRemove(option.id)
                     if (selectedOptions != null) {
-                        fieldWithSelectedOptions[fieldOptionModel.fieldOption.id!!] = selectedOptions
+                        fieldsOptionWithSelected[fieldOptionModel.fieldOption.id] = selectedOptions
                     }
                 }
                 updateCell(option)
@@ -71,7 +71,7 @@ class BooleanAdapter(
         }
 
         private fun updateCell(option: Option) {
-            val selectedOptions=fieldWithSelectedOptions[fieldOptionModel.fieldOption.id!!]
+            val selectedOptions=fieldsOptionWithSelected[fieldOptionModel.fieldOption.id]
             if(selectedOptions != null){
             if (selectedOptions.contains(option.id)) {
                 itemView.txtBoolean.setBackgroundResource(R.drawable.textboolean_background_sky)

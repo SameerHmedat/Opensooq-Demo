@@ -5,7 +5,7 @@ import io.realm.annotations.PrimaryKey
 
 open class Option(
     @PrimaryKey
-    var id: String?=null,
+    var id: String="",
     var field_id: String?=null,
     var label: String?=null,
     var label_en: String?=null,

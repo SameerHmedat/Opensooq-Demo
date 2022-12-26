@@ -11,7 +11,7 @@ import kotlinx.android.synthetic.main.custom_dialog_icon_or_string.*
 
 class DialogIcon(
     private val fieldOptionModel: FieldOptionModel,
-    val fieldWithSelectedOptions: HashMap<Int, ArrayList<String>>,
+    val fieldsOptionWithSelected: HashMap<Int, ArrayList<String>>,
 ) {
 
     var onDialogIconClick: (() -> Unit)? = null
@@ -26,7 +26,7 @@ class DialogIcon(
         dialog.txtInputLayoutSearchDialogBox.hint = fieldOptionModel.fieldLableEn
         dialog.rvCustomDialog.layoutManager = LinearLayoutManager(context)
         dialog.rvCustomDialog.setHasFixedSize(true)
-        val dialogIconAdapter = DialogIconAdapter(fieldOptionModel, fieldWithSelectedOptions)
+        val dialogIconAdapter = DialogIconAdapter(fieldOptionModel, fieldsOptionWithSelected)
         dialog.rvCustomDialog.adapter = dialogIconAdapter
 
         dialog.CancelDialog.setOnClickListener {
@@ -37,10 +37,10 @@ class DialogIcon(
             dialog.dismiss()
         }
         dialog.ResetDialog.setOnClickListener {
-            if (!fieldWithSelectedOptions.containsKey(fieldOptionModel.fieldOption.id)) {
-                fieldWithSelectedOptions[fieldOptionModel.fieldOption.id!!] = arrayListOf()
+            if (!fieldsOptionWithSelected.containsKey(fieldOptionModel.fieldOption.id)) {
+                fieldsOptionWithSelected[fieldOptionModel.fieldOption.id] = arrayListOf()
             } else {
-                fieldWithSelectedOptions[fieldOptionModel.fieldOption.id!!] = arrayListOf()
+                fieldsOptionWithSelected[fieldOptionModel.fieldOption.id] = arrayListOf()
             }
             dialogIconAdapter.notifyDataSetChanged()
         }

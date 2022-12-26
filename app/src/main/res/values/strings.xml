@@ -16,7 +16,8 @@
     <string name="cardIconDes">CardIconDes</string>
     <string name="any__">Any</string>
     <string name="search">search</string>
-    <string name="search_for_category_or_subcategory">search for category or subcategory</string>
+    <string name="search_for_category">Enter Category Name </string>
+    <string name="search_for_Subcategory">Enter Subcategory Name </string>
     <string name="model__">Model</string>
     <string name="model____">Model</string>
     <string name="cancel_">Cancel</string>

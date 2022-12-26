@@ -6,6 +6,6 @@ import io.realm.annotations.PrimaryKey
 
 open class SearchFlow(
     @PrimaryKey
-    var category_id: Int?=null,
+    var category_id: Int =0,
     var order: RealmList<String?>?=null
 ):RealmObject()

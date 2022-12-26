@@ -6,21 +6,19 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.opensooqdemo.R
-import com.example.opensooqdemo.categories.ItemCateg
+import com.example.opensooqdemo.categories.Category
 import com.example.opensooqdemo.constants.Constants.TAG
+import com.example.opensooqdemo.constants.Constants.ZERO
 import com.example.opensooqdemo.exts.loadImage
-import io.realm.OrderedRealmCollection
-import io.realm.RealmRecyclerViewAdapter
+import io.realm.*
 import kotlinx.android.synthetic.main.element_item_category.view.*
-
-class RealmCategoryAdapter(data: OrderedRealmCollection<ItemCateg?>?) :
-    RealmRecyclerViewAdapter<ItemCateg?, RealmCategoryAdapter.RealmCategoryViewHolder?>(
-        data,
-        true
-    ) {
+import java.util.*
 
 
-    var categoryClick: ((Int) -> Unit)? = null
+class RealmCategoryAdapter(data: OrderedRealmCollection<Category?>?) :
+    RealmRecyclerViewAdapter<Category?, RealmCategoryAdapter.RealmCategoryViewHolder?>(data, true) {
+
+    var categoryClick: ((Category) -> Unit)? = null
 
 
     override fun onCreateViewHolder(
@@ -39,21 +37,35 @@ class RealmCategoryAdapter(data: OrderedRealmCollection<ItemCateg?>?) :
         holder.bind(obj)
     }
 
+    fun filterList(label_en: String, type: String, categoryID: Int?) {
+        val realm = Realm.getDefaultInstance()
+        val text = label_en.lowercase(Locale.getDefault())
+        val query: RealmQuery<Category> = when(type){
+            "SubCategory" ->{ realm.where(Category::class.java).equalTo("parent_id", categoryID).sort("order") }
+            else -> { realm.where(Category::class.java).equalTo("parent_id", ZERO).sort("order") }
+        }
+        if (text.isNotEmpty()) {
+            query.contains("label_en", text, Case.INSENSITIVE)
+        }
+        updateData(query.findAll())
+    }
+
 
     inner class RealmCategoryViewHolder(itemView: View) :
         RecyclerView.ViewHolder(itemView) {
         init {
-            itemView.CategoryRow.setOnClickListener {
-                categoryClick?.invoke(adapterPosition)
+            itemView.CategoryElement.setOnClickListener {
+                categoryClick?.invoke(data!![adapterPosition]!!)
             }
         }
 
-        fun bind(itemCateg: ItemCateg?) {
-            itemView.titleCategory.text = itemCateg?.label_en
-            itemView.imgCategory.loadImage(itemCateg?.icon)
+        fun bind(category: Category?) {
+            itemView.titleCategory.text = category?.label_en
+            itemView.imgCategory.loadImage(category?.icon)
         }
 
     }
+
 
     init {
         Log.i(TAG, "Created RealmCategoryAdapter for ${getData()!!.size} items.")

@@ -8,12 +8,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.opensooqdemo.FieldOptionModel
 import com.example.opensooqdemo.R
-import com.google.gson.Gson
 import kotlinx.android.synthetic.main.custom_fragment.*
 
 class CustomFragment : Fragment() {
 
-    var fieldWithSelectedOptions:HashMap<Int,ArrayList<String>> = HashMap()
+    var fieldsOptionWithSelected:HashMap<Int,ArrayList<String>> = HashMap()
     var fragmentListener: (() -> Unit)? = null
 
     override fun onCreateView(
@@ -23,15 +22,14 @@ class CustomFragment : Fragment() {
         return inflater.inflate(R.layout.custom_fragment, container, false)
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
         super.onViewCreated(view, savedInstanceState)
 
         val fieldOptionModel = arguments?.getParcelable<FieldOptionModel>("fieldOptionModelArgument")
 
-        if(arguments?.getSerializable("fieldWithSelectedOptions") !=  null)
-            fieldWithSelectedOptions= arguments?.getSerializable("fieldWithSelectedOptions") as HashMap<Int, ArrayList<String>>
+        if(arguments?.getSerializable("fieldsOptionWithSelected") !=  null)
+            fieldsOptionWithSelected= arguments?.getSerializable("fieldsOptionWithSelected") as HashMap<Int, ArrayList<String>>
 
         txtCustomFragment.text = fieldOptionModel?.fieldLableEn
 
@@ -41,7 +39,7 @@ class CustomFragment : Fragment() {
         val numericAdapter = fieldOptionModel?.let {
             NumericAdapter(
                 fieldOptionModel = it,
-                fieldWithSelectedOptions=fieldWithSelectedOptions
+                fieldsOptionWithSelected=fieldsOptionWithSelected
             )
         }
 

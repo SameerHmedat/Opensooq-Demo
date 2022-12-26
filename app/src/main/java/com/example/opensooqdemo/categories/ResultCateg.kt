@@ -1,6 +1,7 @@
 package com.example.opensooqdemo.categories
 
 import com.google.gson.annotations.SerializedName
+import io.realm.RealmModel
 import io.realm.RealmObject
 
 open class ResultCateg(
@@ -8,4 +9,4 @@ open class ResultCateg(
     var dataCateg: DataCateg?=null,
     var hash: String="",
     var status: Int=0
-):RealmObject()
+)

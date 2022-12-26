@@ -11,7 +11,6 @@ import com.example.opensooqdemo.exts.addRemove
 import com.example.opensooqdemo.exts.loadImage
 import com.example.opensooqdemo.option_raw.Option
 import kotlinx.android.synthetic.main.element_dialog_item_icon.view.*
-import kotlinx.android.synthetic.main.element_dialog_item_string.view.*
 
 class DialogIconAdapter(
     val fieldOptionModel: FieldOptionModel,
@@ -49,10 +48,10 @@ class DialogIconAdapter(
         fun bind(option: Option) {
             itemView.txtDialogIcon.text = option.label_en
 
-            val selectedOptions = fieldWithSelectedOptions[fieldOptionModel.fieldOption.id!!]
+            val selectedOptions = fieldWithSelectedOptions[fieldOptionModel.fieldOption.id]
             if (selectedOptions != null) {
                 itemView.checkBoxDialogIcon.isChecked =
-                    selectedOptions.contains(option.id.orEmpty())
+                    selectedOptions.contains(option.id)
             }
 
 
@@ -69,13 +68,13 @@ class DialogIconAdapter(
             itemView.checkBoxDialogIcon.setOnClickListener {
 
                 if (!fieldWithSelectedOptions.contains(fieldOptionModel.fieldOption.id)) {
-                    fieldWithSelectedOptions[fieldOptionModel.fieldOption.id!!] =
-                        arrayListOf(option.id.orEmpty())
+                    fieldWithSelectedOptions[fieldOptionModel.fieldOption.id] =
+                        arrayListOf(option.id)
                 } else {
-                    val selectedOptionS = fieldWithSelectedOptions[fieldOptionModel.fieldOption.id!!]
-                    selectedOptionS?.addRemove(option.id.orEmpty())
+                    val selectedOptionS = fieldWithSelectedOptions[fieldOptionModel.fieldOption.id]
+                    selectedOptionS?.addRemove(option.id)
                     if (selectedOptionS != null) {
-                        fieldWithSelectedOptions[fieldOptionModel.fieldOption.id!!] = selectedOptionS
+                        fieldWithSelectedOptions[fieldOptionModel.fieldOption.id] = selectedOptionS
                     }
                 }
             }

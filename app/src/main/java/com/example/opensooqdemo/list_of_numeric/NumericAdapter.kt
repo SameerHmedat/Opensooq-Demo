@@ -6,13 +6,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.opensooqdemo.FieldOptionModel
 import com.example.opensooqdemo.R
-import com.example.opensooqdemo.exts.addRemove
 import com.example.opensooqdemo.option_raw.Option
 import kotlinx.android.synthetic.main.element_dialog_numeric.view.*
 
 class NumericAdapter(
     val fieldOptionModel: FieldOptionModel,
-    val fieldWithSelectedOptions: HashMap<Int, ArrayList<String>>
+    val fieldsOptionWithSelected: HashMap<Int, ArrayList<String>>,
 ) :
     RecyclerView.Adapter<NumericAdapter.NumericViewHolder>() {
 
@@ -35,7 +34,7 @@ class NumericAdapter(
     }
 
     inner class NumericViewHolder(
-        itemView: View
+        itemView: View,
     ) :
         RecyclerView.ViewHolder(itemView) {
 
@@ -44,11 +43,12 @@ class NumericAdapter(
             itemView.txtTapValue.text = option.value
             itemView.numericLayout.setOnClickListener {
 
-                if(!fieldWithSelectedOptions.contains(fieldOptionModel.fieldOption.id)){
-                    fieldWithSelectedOptions[fieldOptionModel.fieldOption.id!!] = arrayListOf(option.id.orEmpty())
-                }
-                else{
-                    fieldWithSelectedOptions[fieldOptionModel.fieldOption.id!!] = arrayListOf(option.id.orEmpty())
+                if (!fieldsOptionWithSelected.contains(fieldOptionModel.fieldOption.id)) {
+                    fieldsOptionWithSelected[fieldOptionModel.fieldOption.id] =
+                        arrayListOf(option.id)
+                } else {
+                    fieldsOptionWithSelected[fieldOptionModel.fieldOption.id] =
+                        arrayListOf(option.id)
                 }
                 onNumericItemClick?.invoke()
 

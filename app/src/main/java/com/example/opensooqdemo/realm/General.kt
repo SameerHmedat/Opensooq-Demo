@@ -16,6 +16,7 @@ class General : Application() {
 
         val configuration = RealmConfiguration.Builder()
             .schemaVersion(1)
+            .deleteRealmIfMigrationNeeded()
             .allowWritesOnUiThread(false)
             .allowQueriesOnUiThread(true)
             .name(realmName)

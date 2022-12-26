@@ -21,9 +21,7 @@
     <color name="mediumaquamarine">#66CDAA</color>
     <color name="sky">#35B0FB</color>
     <color name="skyDark">#3779B3</color>
-
-
-
+    <color name="inputTextColor">#666666</color>
 
     <color name="statusBarColor">#000000</color>
     <color name="materialPrimaryColor">#0f1516</color>

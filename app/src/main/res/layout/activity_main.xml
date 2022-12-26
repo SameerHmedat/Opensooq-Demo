@@ -27,14 +27,14 @@
         android:layout_marginStart="5dp"
         android:layout_marginEnd="5dp"
         android:background="@color/white"
-        android:hint="@string/search_for_category_or_subcategory"
-        android:textColorHint="#666666"
-        app:boxStrokeColor="@color/black"
+        android:hint="@string/search_for_category"
+        android:textColorHint="@color/inputTextColor"
+        app:boxStrokeColor="@color/inputTextColor"
         app:endIconMode="clear_text"
-        app:helperTextTextColor="@color/black"
-        app:hintTextColor="#666666"
+        app:hintTextColor="@color/inputTextColor"
         app:startIconDrawable="@drawable/ic_baseline_search_24"
-        app:startIconTint="#666666">
+        app:startIconTint="@color/inputTextColor"
+        >
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/edt_name_Category"
@@ -44,7 +44,7 @@
             android:layout_marginEnd="2dp"
             android:background="@color/white"
             android:inputType="text"
-            android:textColor="#666666"
+            android:textColor="@color/inputTextColor"
             android:textCursorDrawable="@drawable/custom_cursor_drawable"
             app:endIconMode="clear_text" />
 

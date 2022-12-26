@@ -17,9 +17,11 @@ class ThirdActivity : AppCompatActivity() {
     private val viewModel: MainViewModel by lazy { ViewModelProvider(this)[MainViewModel::class.java] }
 
     private val adapterList by lazy {
-        LargeAdapter(viewModel.fieldWithSelectedOptions,
+        LargeAdapter(
+            viewModel.fieldsOptionWithSelected,
             viewModel.backupValueFrom,
-            viewModel.backupValueTo)
+            viewModel.backupValueTo
+        )
     }
     private var searchFlow: SearchFlow? = null
 
@@ -36,7 +38,7 @@ class ThirdActivity : AppCompatActivity() {
         }
 
         if (savedInstanceState == null) {
-            viewModel.fieldWithSelectedOptions.clear()
+            viewModel.fieldsOptionWithSelected.clear()
             viewModel.backupValueFrom.clear()
             viewModel.backupValueTo.clear()
         }
@@ -54,51 +56,23 @@ class ThirdActivity : AppCompatActivity() {
             builder.setNegativeButton("back") { _, _ ->
                 onBackPressed()
             }
-
             val alertDialog = builder.create()
             alertDialog.show()
 
         } else {
-            val results = arrayListOf<FieldOptionModel>()
-            for (i in 0 until searchFlow?.order!!.size) {
-
-                val fieldLableEn =
-                    viewModel.retrieveFieldLable(order = searchFlow?.order!![i].orEmpty())?.label_en
-
-                val fieldOption = viewModel.retrieveFieldOption(
-                    name = searchFlow?.order!![i].orEmpty(), parentID = 0
-                )
-
-                val options = viewModel.retrieveOptions(
-                    field_id = fieldOption?.id.toString(), parent_id = null
-                )?.filter {
-                    it.field_id == fieldOption?.id.toString()
-                }
-
-                fieldOption?.let {
-                    FieldOptionModel(
-                        fieldOption = it,
-                        options = updatingOptions(options.orEmpty()),
-                        fieldLableEn = fieldLableEn.orEmpty()
-                    )
-                }?.let {
-                    results.add(it)
-                }
-            }
-
-
-            adapterList.itemsList = results
+            adapterList.itemsList = viewModel.getItemsList(searchFlow!!)
             recyclerViewFull.apply {
                 layoutManager = LinearLayoutManager(this@ThirdActivity)
                 adapter = adapterList
             }
             adapterList.onShowHiddenField = { fieldOptionModel ->
-                showHideHiddenField(fieldOptionModel = fieldOptionModel, viewModel.fieldWithSelectedOptions)
+                showHideHiddenField(fieldOptionModel = fieldOptionModel,
+                    viewModel.fieldsOptionWithSelected)
             }
         }
 
         for (i in 0 until adapterList.itemsList.size) {
-            showHideHiddenField(adapterList.itemsList[i], viewModel.fieldWithSelectedOptions)
+            showHideHiddenField(adapterList.itemsList[i], viewModel.fieldsOptionWithSelected)
         }
 
     }
@@ -114,7 +88,7 @@ class ThirdActivity : AppCompatActivity() {
     @SuppressLint("NotifyDataSetChanged")
     private fun showHideHiddenField(
         fieldOptionModel: FieldOptionModel,
-        fieldWithSelectedOptions: HashMap<Int, ArrayList<String>>,
+        fieldsOptionWithSelected: HashMap<Int, ArrayList<String>>,
     ) {
         val parentFieldOptionID = fieldOptionModel.fieldOption.id.toString() //brand
 
@@ -126,7 +100,7 @@ class ThirdActivity : AppCompatActivity() {
 
                 removeElement(fieldOption = childrenFieldOption[k])
 
-                val selectedOptions = fieldWithSelectedOptions[fieldOptionModel.fieldOption.id]
+                val selectedOptions = fieldsOptionWithSelected[fieldOptionModel.fieldOption.id]
 
                 if (selectedOptions?.size == 1) {
 
@@ -180,7 +154,7 @@ class ThirdActivity : AppCompatActivity() {
         for (t in 0 until adapterList.itemsList.size) {
             if (fieldOption?.id == adapterList.itemsList[t].fieldOption.id) {
                 adapterList.itemsList.remove(element = adapterList.itemsList[t])
-                viewModel.fieldWithSelectedOptions.remove(fieldOption?.id)
+                viewModel.fieldsOptionWithSelected.remove(fieldOption.id)
                 adapterList.notifyItemRemoved(t)
                 break
             }

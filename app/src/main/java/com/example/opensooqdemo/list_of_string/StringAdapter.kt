@@ -1,7 +1,6 @@
 package com.example.opensooqdemo.list_of_string
 
 import android.annotation.SuppressLint
-import android.util.Log
 import kotlinx.android.synthetic.main.element_item_string.view.*
 import android.view.LayoutInflater
 import android.view.View
@@ -14,7 +13,7 @@ import com.example.opensooqdemo.option_raw.Option
 
 class StringAdapter(
     val fieldOptionModel: FieldOptionModel,
-    val fieldWithSelectedOptions: HashMap<Int, ArrayList<String>>,
+    val fieldsOptionWithSelected: HashMap<Int, ArrayList<String>>,
 ) :
     RecyclerView.Adapter<StringAdapter.StringViewHolder>() {
 
@@ -26,7 +25,7 @@ class StringAdapter(
         val itemView = LayoutInflater.from(parent.context).inflate(
             R.layout.element_item_string, parent, false
         )
-        return StringViewHolder(itemView, fieldWithSelectedOptions)
+        return StringViewHolder(itemView, fieldsOptionWithSelected)
     }
 
     override fun onBindViewHolder(holder: StringViewHolder, position: Int) {
@@ -39,7 +38,7 @@ class StringAdapter(
         return fieldOptionModel.options.size
     }
 
-    inner class StringViewHolder(itemView: View, private val fieldWithSelectedOptions: HashMap<Int, ArrayList<String>>) :
+    inner class StringViewHolder(itemView: View, private val fieldsOptionWithSelected: HashMap<Int, ArrayList<String>>) :
         RecyclerView.ViewHolder(itemView) {
 
 
@@ -49,14 +48,14 @@ class StringAdapter(
 
             updateCell(option)
             itemView.CardString.setOnClickListener {
-                if (!fieldWithSelectedOptions.contains(fieldOptionModel.fieldOption.id)) {
-                    fieldWithSelectedOptions[fieldOptionModel.fieldOption.id!!] =
-                        arrayListOf(option.id.orEmpty())
+                if (!fieldsOptionWithSelected.contains(fieldOptionModel.fieldOption.id)) {
+                    fieldsOptionWithSelected[fieldOptionModel.fieldOption.id] =
+                        arrayListOf(option.id)
                 } else {
-                    val selectedOptions = fieldWithSelectedOptions[fieldOptionModel.fieldOption.id!!]
-                    selectedOptions?.addRemove(option.id.orEmpty())
+                    val selectedOptions = fieldsOptionWithSelected[fieldOptionModel.fieldOption.id]
+                    selectedOptions?.addRemove(option.id)
                     if (selectedOptions != null) {
-                        fieldWithSelectedOptions[fieldOptionModel.fieldOption.id!!] = selectedOptions
+                        fieldsOptionWithSelected[fieldOptionModel.fieldOption.id] = selectedOptions
                     }
                 }
                 onStringClick?.invoke()
@@ -66,9 +65,9 @@ class StringAdapter(
 
         private fun updateCell(option: Option) {
 
-            val selectedOptions=fieldWithSelectedOptions[fieldOptionModel.fieldOption.id!!]
+            val selectedOptions=fieldsOptionWithSelected[fieldOptionModel.fieldOption.id]
             if(selectedOptions!=null){
-                itemView.CardString.isChecked = selectedOptions.contains(option.id.orEmpty())
+                itemView.CardString.isChecked = selectedOptions.contains(option.id)
                 if (itemView.CardString.isChecked) {
                     itemView.CardString.strokeWidth = 4
                     itemView.CardString.checkedIcon = null

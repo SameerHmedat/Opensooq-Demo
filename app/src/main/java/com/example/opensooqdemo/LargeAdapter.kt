@@ -9,6 +9,7 @@ import com.example.opensooqdemo.constants.Constants.TYPE_LIST_BOOLEAN
 import com.example.opensooqdemo.constants.Constants.TYPE_LIST_NUMERIC
 import com.example.opensooqdemo.constants.Constants.TYPE_LIST_STRING
 import com.example.opensooqdemo.constants.Constants.TYPE_LIST_STRING_OF_ICON
+import com.example.opensooqdemo.constants.Constants.ZERO
 import com.example.opensooqdemo.constants.Constants.updatingOptions
 import com.example.opensooqdemo.databinding.*
 import com.example.opensooqdemo.list_of_boolean.BooleanAdapter
@@ -25,7 +26,7 @@ import kotlinx.android.synthetic.main.custom_dialog_taps.*
 
 
 class LargeAdapter(
-    val fieldWithSelectedOptions: HashMap<Int, ArrayList<String>>,
+    val fieldsOptionWithSelected: HashMap<Int, ArrayList<String>>,
     val backupValuesFrom: HashMap<Int, String>,
     val backupValuesTo: HashMap<Int, String>,
 
@@ -54,7 +55,8 @@ class LargeAdapter(
 
             val stringAdapter =
                 StringAdapter(
-                    fieldOptionModel = fieldOptionModel, fieldWithSelectedOptions = fieldWithSelectedOptions
+                    fieldOptionModel = fieldOptionModel,
+                    fieldsOptionWithSelected = fieldsOptionWithSelected
                 )
 
             itemBinding.rvListOfString.adapter = stringAdapter
@@ -66,7 +68,7 @@ class LargeAdapter(
             itemBinding.openDialogString.setOnClickListener {
                 val dialog = DialogString(
                     fieldOptionModel = fieldOptionModel,
-                    fieldWithSelectedOptions = fieldWithSelectedOptions
+                    fieldsOptionWithSelected = fieldsOptionWithSelected
                 )
                 dialog.showDialog(context = itemBinding.rvListOfString.context)
                 dialog.onDialogStringClick = {
@@ -78,8 +80,8 @@ class LargeAdapter(
 
         private fun updateSelectedOptions(fieldOptionModel: FieldOptionModel) {
             itemBinding.subTitleString.text = ""
-            if (fieldWithSelectedOptions.contains(fieldOptionModel.fieldOption.id)) {
-                val selectedOptions = fieldWithSelectedOptions[fieldOptionModel.fieldOption.id]
+            if (fieldsOptionWithSelected.contains(fieldOptionModel.fieldOption.id)) {
+                val selectedOptions = fieldsOptionWithSelected[fieldOptionModel.fieldOption.id]
                 if (selectedOptions?.isNotEmpty() == true) {
                     val text = fieldOptionModel.options.filter {
                         selectedOptions.contains(it.id)
@@ -114,7 +116,7 @@ class LargeAdapter(
             val iconAdapter =
                 IconAdapter(
                     fieldOptionModel = fieldOptionModel,
-                    fieldWithSelectedOptions = fieldWithSelectedOptions
+                    fieldsOptionWithSelected = fieldsOptionWithSelected
                 )
 
 
@@ -132,7 +134,7 @@ class LargeAdapter(
             itemBinding.openDialogIcon.setOnClickListener {
                 val dialog = DialogIcon(
                     fieldOptionModel = fieldOptionModel,
-                    fieldWithSelectedOptions = fieldWithSelectedOptions
+                    fieldsOptionWithSelected = fieldsOptionWithSelected
                 )
                 dialog.showDialog(context = itemBinding.rvListOfIconOFString.context)
                 dialog.onDialogIconClick = {
@@ -145,8 +147,8 @@ class LargeAdapter(
 
         private fun updateSelectedOptions(fieldOptionModel: FieldOptionModel) {
             itemBinding.subTitleIcon.text = ""
-            if (fieldWithSelectedOptions.contains(fieldOptionModel.fieldOption.id)) {
-                val selectedOptions = fieldWithSelectedOptions[fieldOptionModel.fieldOption.id]
+            if (fieldsOptionWithSelected.contains(fieldOptionModel.fieldOption.id)) {
+                val selectedOptions = fieldsOptionWithSelected[fieldOptionModel.fieldOption.id]
                 if (selectedOptions?.isNotEmpty() == true) {
                     val text = fieldOptionModel.options.filter {
                         selectedOptions.contains(it.id)
@@ -177,14 +179,14 @@ class LargeAdapter(
 
             val dialog = NumericDialog(
                 fieldOptionModel = fieldOptionModel,
-                fieldWithSelectedOptions = fieldWithSelectedOptions,
+                fieldsOptionWithSelected = fieldsOptionWithSelected,
                 context = itemBinding.numericFromValue.context
             )
             dialog.dialogNumericListener = { pos: Int ->
 
                 var value = ""
                 for (i in 0 until fieldOptionModel.options.size) {
-                    if (fieldWithSelectedOptions[fieldOptionModel.fieldOption.id!!]?.first()
+                    if (fieldsOptionWithSelected[fieldOptionModel.fieldOption.id]?.first()
                             .orEmpty() == fieldOptionModel.options[i].id
                     ) {
                         value = fieldOptionModel.options[i].value.orEmpty()
@@ -193,13 +195,13 @@ class LargeAdapter(
 
                 when (pos) {
                     0 -> {
-                        backupValuesFrom[fieldOptionModel.fieldOption.id!!] = value
+                        backupValuesFrom[fieldOptionModel.fieldOption.id] = value
                         itemBinding.numericFromValue.text = value
                         itemBinding.numericToValue.text = ""
-                        backupValuesTo[fieldOptionModel.fieldOption.id!!] = ""
+                        backupValuesTo[fieldOptionModel.fieldOption.id] = ""
                     }
                     1 -> {
-                        backupValuesTo[fieldOptionModel.fieldOption.id!!] = value
+                        backupValuesTo[fieldOptionModel.fieldOption.id] = value
                         itemBinding.numericToValue.text = value
                     }
                 }
@@ -222,7 +224,7 @@ class LargeAdapter(
 
                 if (backupValuesFrom.isNotEmpty()) {
                     (fieldOptionModel.options as ArrayList).removeAll {
-                        it.value!! < backupValuesFrom[fieldOptionModel.fieldOption.id!!].orEmpty()
+                        it.value!! < backupValuesFrom[fieldOptionModel.fieldOption.id].orEmpty()
                     }
                 }
                 dialog.showNumericDialog(activity = itemBinding.numericToValue.context as ThirdActivity)
@@ -231,13 +233,12 @@ class LargeAdapter(
         }
 
         private fun retrieveOptions(field_id: String, parent_id: String?): RealmResults<Option>? {
-            val zero = "0"
             val realm = Realm.getDefaultInstance()
             return realm.where(Option::class.java)
                 .equalTo("field_id", field_id)
                 .equalTo("parent_id", parent_id)
                 .or()
-                .equalTo("parent_id", zero)
+                .equalTo("parent_id", ZERO.toString())
                 .findAll()
         }
     }
@@ -258,7 +259,7 @@ class LargeAdapter(
 
             val booleanAdapter = BooleanAdapter(
                 fieldOptionModel = fieldOptionModel,
-                fieldWithSelectedOptions = fieldWithSelectedOptions
+                fieldsOptionWithSelected = fieldsOptionWithSelected
             )
             itemBinding.rvListOfBoolean.adapter = booleanAdapter
 

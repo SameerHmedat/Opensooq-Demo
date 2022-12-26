@@ -32,18 +32,19 @@
         android:textSize="25sp"
         android:textStyle="normal" />
 
+
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/txtInputLayoutSubCategory"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:background="@color/white"
-        android:hint="@string/search"
-        android:textColorHint="#666666"
-        app:boxStrokeColor="@color/black"
+        android:hint="@string/search_for_Subcategory"
+        android:textColorHint="@color/inputTextColor"
+        app:boxStrokeColor="@color/inputTextColor"
         app:endIconMode="clear_text"
-        app:hintTextColor="#666666"
+        app:hintTextColor="@color/inputTextColor"
         app:startIconDrawable="@drawable/ic_baseline_search_24"
-        app:startIconTint="#666666">
+        app:startIconTint="@color/inputTextColor">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/edt_name_SubCategory"
@@ -53,9 +54,10 @@
             android:layout_marginEnd="2dp"
             android:background="@color/white"
             android:inputType="text"
-            android:textColor="@color/black"
+            android:textColor="@color/inputTextColor"
             android:textCursorDrawable="@drawable/custom_cursor_drawable"
-            app:endIconMode="clear_text" />
+            app:endIconMode="clear_text"
+            />
 
     </com.google.android.material.textfield.TextInputLayout>
 
