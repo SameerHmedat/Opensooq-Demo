@@ -37,13 +37,6 @@ class ThirdActivity : AppCompatActivity() {
             onBackPressed()
         }
 
-        if (savedInstanceState == null) {
-            viewModel.fieldsOptionWithSelected.clear()
-            viewModel.backupValueFrom.clear()
-            viewModel.backupValueTo.clear()
-        }
-
-
         val subCategoryID = intent.extras?.getInt("SubCategoryID")
 
         searchFlow = viewModel.retrieveSearchFlow(categID = subCategoryID!!)
@@ -127,7 +120,7 @@ class ThirdActivity : AppCompatActivity() {
 
                     val updatedOptions = options?.let { updatingOptions(options = it) }
 
-                    val fieldLable =
+                    val fieldLableEn =
                         viewModel.retrieveFieldLable(order = childrenFieldOption[k]?.name.orEmpty())?.label_en
 
 
@@ -135,7 +128,7 @@ class ThirdActivity : AppCompatActivity() {
                         FieldOptionModel(
                             fieldOption = fieldOption,
                             options = updatedOptions.orEmpty(),
-                            fieldLableEn = fieldLable.orEmpty()
+                            fieldLableEn = fieldLableEn.orEmpty()
                         )
                     }?.let { newFieldOptionModel ->
                         adapterList.itemsList.add(

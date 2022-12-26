@@ -14,7 +14,7 @@ import kotlinx.android.synthetic.main.element_dialog_item_icon.view.*
 
 class DialogIconAdapter(
     val fieldOptionModel: FieldOptionModel,
-    val fieldWithSelectedOptions: HashMap<Int, ArrayList<String>>,
+    val fieldsOptionWithSelected: HashMap<Int, ArrayList<String>>,
 ) :
     RecyclerView.Adapter<DialogIconAdapter.CustomDialogStringIconViewHolder>() {
 
@@ -26,7 +26,7 @@ class DialogIconAdapter(
         val itemView = LayoutInflater.from(parent.context).inflate(
             R.layout.element_dialog_item_icon, parent, false
         )
-        return CustomDialogStringIconViewHolder(itemView, fieldWithSelectedOptions, fieldOptionModel)
+        return CustomDialogStringIconViewHolder(itemView, fieldsOptionWithSelected, fieldOptionModel)
     }
 
     override fun onBindViewHolder(holder: CustomDialogStringIconViewHolder, position: Int) {
@@ -40,7 +40,7 @@ class DialogIconAdapter(
 
     class CustomDialogStringIconViewHolder(
         itemView: View,
-        val fieldWithSelectedOptions: HashMap<Int, ArrayList<String>>,
+        val fieldsOptionWithSelected: HashMap<Int, ArrayList<String>>,
         val fieldOptionModel: FieldOptionModel,
     ) :
         RecyclerView.ViewHolder(itemView) {
@@ -48,7 +48,7 @@ class DialogIconAdapter(
         fun bind(option: Option) {
             itemView.txtDialogIcon.text = option.label_en
 
-            val selectedOptions = fieldWithSelectedOptions[fieldOptionModel.fieldOption.id]
+            val selectedOptions = fieldsOptionWithSelected[fieldOptionModel.fieldOption.id]
             if (selectedOptions != null) {
                 itemView.checkBoxDialogIcon.isChecked =
                     selectedOptions.contains(option.id)
@@ -59,7 +59,6 @@ class DialogIconAdapter(
                 "-1" -> {
                     itemView.imgDialogIcon.loadImage(option.option_img?.toInt())
                 }
-
                 else -> {
                     itemView.imgDialogIcon.loadImage(IMAGE_BASE + option.option_img)
                 }
@@ -67,14 +66,14 @@ class DialogIconAdapter(
 
             itemView.checkBoxDialogIcon.setOnClickListener {
 
-                if (!fieldWithSelectedOptions.contains(fieldOptionModel.fieldOption.id)) {
-                    fieldWithSelectedOptions[fieldOptionModel.fieldOption.id] =
+                if (!fieldsOptionWithSelected.contains(fieldOptionModel.fieldOption.id)) {
+                    fieldsOptionWithSelected[fieldOptionModel.fieldOption.id] =
                         arrayListOf(option.id)
                 } else {
-                    val selectedOptionS = fieldWithSelectedOptions[fieldOptionModel.fieldOption.id]
+                    val selectedOptionS = fieldsOptionWithSelected[fieldOptionModel.fieldOption.id]
                     selectedOptionS?.addRemove(option.id)
                     if (selectedOptionS != null) {
-                        fieldWithSelectedOptions[fieldOptionModel.fieldOption.id] = selectedOptionS
+                        fieldsOptionWithSelected[fieldOptionModel.fieldOption.id] = selectedOptionS
                     }
                 }
             }

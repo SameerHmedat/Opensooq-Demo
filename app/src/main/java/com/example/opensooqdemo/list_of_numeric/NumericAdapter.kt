@@ -40,7 +40,7 @@ class NumericAdapter(
 
 
         fun bind(option: Option) {
-            itemView.txtTapValue.text = option.value
+            itemView.txtValue.text = option.value
             itemView.numericLayout.setOnClickListener {
 
                 if (!fieldsOptionWithSelected.contains(fieldOptionModel.fieldOption.id)) {

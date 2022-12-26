@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.opensooqdemo.FieldOptionModel
 import com.example.opensooqdemo.R
 import com.example.opensooqdemo.exts.addRemove
+import com.example.opensooqdemo.exts.visible
 import com.example.opensooqdemo.option_raw.Option
 
 class StringAdapter(
@@ -71,10 +72,10 @@ class StringAdapter(
                 if (itemView.CardString.isChecked) {
                     itemView.CardString.strokeWidth = 4
                     itemView.CardString.checkedIcon = null
-                    itemView.CardStringCheck.visibility = View.VISIBLE
+                    itemView.CardStringCheck.visible(true)
                 } else {
                     itemView.CardString.strokeWidth = 0
-                    itemView.CardStringCheck.visibility = View.INVISIBLE
+                    itemView.CardStringCheck.visible(false)
                 }
             }
         }

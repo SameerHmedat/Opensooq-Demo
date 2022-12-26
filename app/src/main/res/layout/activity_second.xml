@@ -47,7 +47,7 @@
         app:startIconTint="@color/inputTextColor">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/edt_name_SubCategory"
+            android:id="@+id/txtInputSubCategory"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="2dp"

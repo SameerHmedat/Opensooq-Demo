@@ -9,6 +9,7 @@ import com.example.opensooqdemo.R
 import com.example.opensooqdemo.constants.Constants.IMAGE_BASE
 import com.example.opensooqdemo.exts.addRemove
 import com.example.opensooqdemo.exts.loadImage
+import com.example.opensooqdemo.exts.visible
 import com.example.opensooqdemo.option_raw.Option
 import kotlinx.android.synthetic.main.element_item_icon.view.*
 
@@ -47,14 +48,14 @@ class IconAdapter(
 
             when (option.id) {
                 "-1" -> {
-                    itemView.CardIconImage.visibility = View.INVISIBLE
-                    itemView.txtCardIcon.visibility = View.VISIBLE
+                    itemView.imgCardIcon.visible(false)
+                    itemView.txtCardIcon.visible(true)
                 }
 
                 else -> {
-                    itemView.CardIconImage.visibility = View.VISIBLE
-                    itemView.txtCardIcon.visibility = View.GONE
-                    itemView.CardIconImage.loadImage(IMAGE_BASE + option.option_img)
+                    itemView.imgCardIcon.visible(true)
+                    itemView.txtCardIcon.visible(false)
+                    itemView.imgCardIcon.loadImage(IMAGE_BASE + option.option_img)
                 }
             }
             updateCell(option)
@@ -81,11 +82,10 @@ class IconAdapter(
                 if (itemView.CardIcon.isChecked) {
                     itemView.CardIcon.strokeWidth = 4
                     itemView.CardIcon.checkedIcon = null
-                    itemView.CardIconCheck.visibility = View.VISIBLE
-
+                    itemView.CardIconCheck.visible(true)
                 } else {
                     itemView.CardIcon.strokeWidth = 0
-                    itemView.CardIconCheck.visibility = View.INVISIBLE
+                    itemView.CardIconCheck.visible(false)
                 }
             }
         }

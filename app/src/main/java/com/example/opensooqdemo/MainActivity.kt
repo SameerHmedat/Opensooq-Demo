@@ -12,11 +12,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.opensooqdemo.realm.RealmCategoryAdapter
 import com.example.opensooqdemo.viewModel.MainViewModel
-import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_main.*
 
 
-@Suppress("DEPRECATION")
 class MainActivity : AppCompatActivity() {
 
     private val viewModel: MainViewModel by lazy { ViewModelProvider(this)[MainViewModel::class.java] }
@@ -49,7 +47,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun changeText() {
-        edt_name_Category.addTextChangedListener(object : TextWatcher {
+        txtInputCategory.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
             }
 
@@ -57,8 +55,8 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun afterTextChanged(p0: Editable?) {
-                rvCategories.visibility = View.VISIBLE
-                realmCategoryAdapter?.filterList(label_en = p0.toString(),
+                realmCategoryAdapter?.filterList(
+                    label_en = p0.toString(),
                     type = "Category",
                     categoryID = -1)
             }
